@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<title>Google Maps JavaScript API Example</title>
+		<style type="text/css">
+			html
+			{
+				height:100%;
+			}
+			body
+			{
+				height:100%;
+				margin:0px;
+				padding:0px;
+				border-left:0px;
+				border-right:0px;
+				overflow:hidden;
+			}
+			</style>
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAGsN_Wn7H6uz3c0yKgftLvxTiGP0_-k0J-UBOr2IDlsxj6Fyf4hQBXIPDlA_ARVMlaOoXFafQJXR-_A" type="text/javascript"></script>
+		<script src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			
+			//<![CDATA[
+			var map;
+			var point;
+			var wayPoint;
+			var trak;
+			var mapa;
+			var mapaI;
+			var mapaF;
+			
+			var markerStart,markerEnd;
+			
+			//var greenIcon=new GIcon(G_DEFAULT_ICON,"http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png");
+			//var redIcon=new GIcon(G_DEFAULT_ICON,"http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png");
+			var blueIcon="http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png";
+			var photoIcon="http://maps.google.com/mapfiles/ms/micons/camera.png";
+			
+			var startIcon="http://www.google.com/intl/en_us/mapfiles/dd-start.png";
+			var endIcon="http://www.google.com/intl/en_us/mapfiles/dd-end.png";
+			
+			var mgr;
+						
+			function load() {
+				map = new GMap2(document.getElementById("map"));
+				map.setCenter(new GLatLng(37.4419, -122.1419), 13);
+				map.addControl(new GSmallMapControl());
+				map.addControl(new GMapTypeControl());
+				mgr = new MarkerManager(map);
+			}
+			
+			function setPoint(lat,long) {
+				if(point!=null) map.removeOverlay(point);
+				point=center(lat,long);
+			}
+			
+			function setWayPoint(lat,long) {
+				if(wayPoint!=null) map.removeOverlay(wayPoint);
+				wayPoint=center(lat,long);
+			}
+			
+			function clearPhotos(){
+				mgr.clearMarkers();
+			}
+			
+			function addPhoto(name,lat,long){
+				alert("1-->addPhoto("+name+")");
+				var p=new GLatLng(lat, long);
+				alert("2-->addPhoto("+name+")");
+				var icon=new GMarker(p);
+				alert("3-->addPhoto("+name+")");
+				//icon.setImage(photoIcon);				
+				GEvent.addListener(icon, "click", function() {
+								   var app=window.appController;
+								   icon.openInfoWindowHtml(app.hola_(name));
+								   }); 
+				//map.addOverlay(icon);
+				alert("4-->");
+				mgr.addMarker(icon,1);
+				alert("-->"+mgr);
+				
+				mgr.refresh();
+			}
+			
+			function center(lat,long){
+				var p=new GLatLng(lat, long);
+				map.panTo(p, 10);
+				var res=new GMarker(p);
+				map.addOverlay(res);
+				res.setImage(blueIcon);
+				return res;
+			}
+			
+			function setTrak(encodedPoints,encodedLevels){
+				if(trak!=null) map.removeOverlay(trak);
+				if(markerStart!=null) map.removeOverlay(markerStart);
+				if(markerEnd!=null) map.removeOverlay(markerEnd);
+				
+				alert("-->setTrak");
+				trak = new GPolyline.fromEncoded({color: "#0000ff", weight: 4, points: encodedPoints, levels: encodedLevels, zoomFactor: 10, numLevels: 4 });
+				
+				map.addOverlay(trak);
+				var bounds=trak.getBounds();
+				var zoom=map.getBoundsZoomLevel(bounds);
+				map.setCenter(bounds.getCenter(), zoom);
+				
+				markerStart = new GMarker(trak.getVertex(0));
+				markerEnd = new GMarker(trak.getVertex(trak.getVertexCount()-1));
+				
+				map.addOverlay(markerStart);
+				map.addOverlay(markerEnd);
+				
+				markerStart.setImage(startIcon);
+				markerEnd.setImage(endIcon);
+			}
+			
+			function setMap(encodedPoints,encodedLevels){
+				if(mapa!=null) map.removeOverlay(mapa);
+				if(mapaI!=null) map.removeOverlay(mapaI);
+				if(mapaF!=null) map.removeOverlay(mapaF);
+				
+				mapa = new GPolyline.fromEncoded({color: "#ff0000", weight: 6, points: encodedPoints, levels: encodedLevels, zoomFactor: 10, numLevels: 4 });
+				mapaI = new GMarker(mapa.getVertex(0));
+				mapaF = new GMarker(mapa.getVertex(mapa.getVertexCount()-1));
+				
+				map.addOverlay(mapa);
+				map.addOverlay(mapaI);
+				map.addOverlay(mapaF);
+
+				mapaI.setImage(startIcon);
+				mapaF.setImage(endIcon);
+			}
+			//]]>
+			</script>
+		</head>
+	<body onload="load()" onunload="GUnload()">
+		<div id="map" style="width: 100%; height: 100%"></div>
+		</body>
+	</html>
