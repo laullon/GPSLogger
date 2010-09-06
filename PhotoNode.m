@@ -12,6 +12,7 @@
 
 @synthesize URL;
 @synthesize date;
+@synthesize dateO;
 @synthesize gpsPoint;
 @synthesize name;
 @synthesize width;
@@ -26,7 +27,7 @@
 
 -(NSXMLElement *)getKMLElement
 {
-	NSString *des=[NSString stringWithFormat:@"<img src=\"%@\" width=\"%@\" height=\"%@\"/>",[[self URL] absoluteString],[self width],[self height]]; 
+	NSString *des=[NSString stringWithFormat:@"g<img src=\"%@\" width=\"%@\" height=\"%@\"/>",[[self URL] path],[self width],[self height]]; 
 	
 	NSXMLElement *place = [NSXMLElement elementWithName:@"Placemark"];
 	[place addChild:[NSXMLElement elementWithName:@"name" stringValue:[self name]]];

@@ -1,12 +1,19 @@
-#### `.gitignore`
-# xcode noise
-build/*
+
+
+# xcode/mac files
+*~.nib/
+*.perspective
+*.perspectivev3
+*.pbxuser
 *.mode1v3
-
-# SVN directories
-.svn
-
-# osx noise
 .DS_Store
 profile
+._*
+
+# backup files
+*~
+*.bak
+
+# Build/Output Files Directories
+build/
 

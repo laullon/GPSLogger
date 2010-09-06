@@ -16,7 +16,6 @@
 @class PreferencesController;
 
 @interface AppController : NSObject {
-	IBOutlet NSPanel *readingSheet;
 	IBOutlet NSWindow *mainWindow;
 	IBOutlet NSArrayController *datos;
 	IBOutlet NSTreeController *links;
@@ -26,6 +25,9 @@
 	IBOutlet NSTextFieldCell *progressText;
 
 	IBOutlet NSTextFieldCell *statusBar;
+	IBOutlet NSTextFieldCell *timeOffsetTXT;
+	IBOutlet NSSlider *timeOffset;
+	IBOutlet NSPopUpButton *timeZones;
 
 	IBOutlet WebView *web;
 	
@@ -53,16 +55,11 @@
 
 	NSString *devicePath;
 	
-	NSTimeZone *timeZone;
 	NSDateFormatter *sISO8601;
-
-	NSNumber *timeOffSet;
 }
 
 @property (readonly) NSTextFieldCell *statusBar;
 @property (copy) NSString *devicePath;
-@property (copy) NSTimeZone *timeZone;
-@property (copy)NSNumber *timeOffSet;
 
 - (void)addImages:(NSArray *)arrayPhotos;
 
@@ -79,7 +76,7 @@
 - (IBAction)exportToKML:(id) sender;
 - (IBAction)exportToGPX:(id) sender;
 
--(void)positionImages;
+- (void)positionImages;
 
 -(IBAction)setIniMapPointAction:(id)sender;
 -(IBAction)setFinMapPointAction:(id)sender;
@@ -92,6 +89,7 @@
 - (void)readFromLogger;
 - (void)addImages:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)addImagesFromDisk:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo;
+- (void)addImagesFromDisk:(NSArray *)files;
 
 - (IBAction)updateView:(id)sender;
 - (void)updateTrack:(TrackNode *)node;
@@ -125,7 +123,9 @@
 - (NSString *)hola:(NSString *)txt;
 - (void)readData:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)readFromGPXFile:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo;
+- (void)readFromGPXFile:(NSString *)file;
 
+- (IBAction)updateTimeOffset:(id)sender;
 
 static void initUSB(AppController *app);
 static void MyDeviceAddedCallback(void *refCon, io_iterator_t it);

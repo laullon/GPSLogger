@@ -22,8 +22,6 @@
 
 @synthesize statusBar;
 @synthesize devicePath;
-@synthesize timeZone;
-@synthesize timeOffSet;
 
 #define FLICKR_BT 1
 #define DISCK_BT 2
@@ -69,7 +67,7 @@
 {
 	NSLog(@"-- applyGeoTags --- %@ -----------",[photo URL]);
 	if([self setDateDigitized:[photo gpsPoint] forPhotoWithURL:[photo URL]])
-	NSLog(@"-- applyGeoTags --- ok -----------");
+		NSLog(@"-- applyGeoTags --- ok -----------");
 }
 
 - (BOOL)setDateDigitized:(GPSPoint *)point forPhotoWithURL:(NSURL *)URL;
@@ -94,18 +92,18 @@
     
     //if(!EXIFDictionary)
     //{
-        //if the image does not have an EXIF dictionary (not all images do), then create one for us to use
-		//EXIFDictionary = [NSMutableDictionary dictionary];
+	//if the image does not have an EXIF dictionary (not all images do), then create one for us to use
+	//EXIFDictionary = [NSMutableDictionary dictionary];
     //}
     
     
     //we need to format the date so it conforms to the EXIF spec and can be read by other apps
 	
     /*NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
-    [dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-    [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"]; //the date format for EXIF dates as from http://www.abmt.unibas.ch/dokumente/ExIF.pdf
-    NSString *EXIFFormattedCreatedDate = [dateFormatter stringFromDate:date]; //use the date formatter to get a string from the date we were passed in the EXIF format
-    [dateFormatter release];*/
+	 [dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+	 [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"]; //the date format for EXIF dates as from http://www.abmt.unibas.ch/dokumente/ExIF.pdf
+	 NSString *EXIFFormattedCreatedDate = [dateFormatter stringFromDate:date]; //use the date formatter to get a string from the date we were passed in the EXIF format
+	 [dateFormatter release];*/
     
 	/****
 	 24 : <CFString 0xa0531938 [0xa03ee1a0]>{contents = "{GPS}"} = <CFDictionary 0x10c2c30 [0xa03ee1a0]>{type = mutable, count = 7, capacity = 12, pairs = (
@@ -119,7 +117,7 @@
 	 0 : <CFNumber 0x101a180 [0xa03ee1a0]>{value = +2, type = kCFNumberSInt32Type}
 	 1 : <CFNumber 0x101ab80 [0xa03ee1a0]>{value = +0, type = kCFNumberSInt32Type}
 	 */
-	 
+	
 	NSString *latRef, *lonRef;
 	if([[point latitud] doubleValue]>0) latRef=@"N"; else latRef=@"S";
 	if([[point longitud] doubleValue]>0) lonRef=@"E"; else lonRef=@"W";
@@ -186,46 +184,71 @@
 	[progress setIndeterminate:NO];
 	[progress setMaxValue:[[photos childNodes] count]];
 	[progress setDoubleValue:0];
-	[NSApp beginSheet:readingSheet modalForWindow:mainWindow modalDelegate:self didEndSelector:nil contextInfo:nil];
 	
 	for(PhotoNode *photo in [photos childNodes]){
 		[progress incrementBy:1];
 		[photo applyGeoTags];
 	}
-	
-	[NSApp endSheet:readingSheet];
-	[readingSheet orderOut:self];
-	
+		
 	[pool release];
+}
+
+- (void)openProgress:(NSString *)txt count:(NSNumber *)count
+{
+	[progressText setStringValue:txt];
+	[progress setHidden:NO];
+	[progress setIndeterminate:NO];
+	[progress setMaxValue:[count doubleValue]];
+	[progress setDoubleValue:0];
+}
+
+- (void)closeProgress
+{
+	[progressText setStringValue:@""];
+	[progress setHidden:YES];
+
 }
 
 - (void)positionImages
 {
-	if(timeOffSet==nil) timeOffSet=[NSNumber numberWithInt:0];
+	NSTimeZone *tz=[NSTimeZone timeZoneWithName:[timeZones titleOfSelectedItem]];
+	NSNumber *off=[NSNumber numberWithInt:[timeOffset intValue]];
 	NSLog(@"positionImages");
-	NSLog(@"timeOffSet='%@'", timeOffSet);
+	NSLog(@"off='%@'", off);
 	
 	if([points count]==0) return;
 	if([[photos childNodes] count]==0) return;
-	
+	if(tz==nil) return;
+		
 	id win = [web windowScriptObject];	
 	
 	/*[progressText setStringValue:@"Positioning photos on map"];
 	 [progress setIndeterminate:NO];
 	 [progress setMaxValue:[[photos childNodes] count]];
-	 [progress setDoubleValue:0];
-	 [NSApp beginSheet:readingSheet modalForWindow:mainWindow modalDelegate:self didEndSelector:nil contextInfo:nil];*/
+	 [progress setDoubleValue:0];*/
 	
+	NSDateFormatter *df=[[NSDateFormatter alloc] init];
+	[df setDateFormat:@"yyyy-MM-dd HH:mm:ss z"];
 	
 	[win callWebScriptMethod:@"clearPhotos" withArguments:nil];
 	for(PhotoNode *photo in [photos childNodes]){
-		//[progress incrementBy:1];
-		NSDate *date=[[photo date] addTimeInterval:[timeOffSet doubleValue]];
-		//		NSDate *date=[[photo date] addTimeInterval:((double)(60*60*-3))];
-		NSLog(@"%@ - %@",date,[photo date]);
-		
+
+		NSMutableString *dateS=[NSMutableString stringWithString:[photo dateO]];
+		[dateS appendString:@" "];
+		[dateS appendString:[tz abbreviation]];
+		[photo setDate:[df dateFromString:dateS]];
+
+		NSDate *date=[[photo date] dateByAddingTimeInterval:[off doubleValue]];
 		GPSPoint *point=[self findPoint:date ini:0 fin:([points count]-1)];
 		[photo setGpsPoint:point];		
+
+		NSLog(@"         tz: '%@'",tz);
+		NSLog(@"photo.dateO: '%@'",[photo dateO]);
+		NSLog(@"      dateS: '%@'",dateS);
+		NSLog(@" photo.date: '%@'",[photo date]);
+		NSLog(@"       date: '%@'",[[photo date] descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithName:@"UTC"] locale:nil]);
+		NSLog(@"point.fecha: '%@'",[[point fecha] descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithName:@"UTC"] locale:nil]);
+		NSLog(@"point.fecha: '%@'",[point fecha]);
 		
 		NSMutableArray *args = [NSMutableArray new];
 		[args addObject:[photo name]];
@@ -233,9 +256,6 @@
 		[args addObject:[point longitud]];
 		[win callWebScriptMethod:@"addPhoto" withArguments:args];
 	}
-	
-	/*[NSApp endSheet:readingSheet];
-	 [readingSheet orderOut:self];*/
 }
 
 - (void)addImages:(NSArray *)arrayPhotos
@@ -245,13 +265,15 @@
 		PhotoNode *photo=[PhotoNode treeNodeWithRepresentedObject:[p objectForKey:@"name"]];
 		
 		NSMutableString *dateS=[[p objectForKey:@"date"] mutableCopy];
-		[dateS appendString:[NSString stringWithFormat:@" %+05d",(([timeZone secondsFromGMT]*100)/3600)]];
+		[dateS appendString:@" +0000"];
+		NSLog(@"--> (%@) %@",dateS,[NSDate dateWithString:dateS]);
 		
 		[photo setName:[p objectForKey:@"name"]];
 		[photo setWidth:[p objectForKey:@"width"]];
 		[photo setHeight:[p objectForKey:@"height"]];
 		[photo setDelegate:[p objectForKey:@"delegate"]];
-		[photo setDate:[NSDate dateWithString: dateS]];
+		[photo setDate:[NSDate dateWithString:dateS]];
+		[photo setDateO:[p objectForKey:@"date"]];
 		[photo setURL:[NSURL URLWithString:[p objectForKey:@"url"]]];
 		[photo setAuxProperties:p];
 		
@@ -265,11 +287,16 @@
 - (void)addImagesFromDisk:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
 {
 	NSArray *files=[panel filenames];
+	[self addImagesFromDisk:files];
+}
+
+- (void)addImagesFromDisk:(NSArray *)files
+{
 	NSString *fileName;
 	NSMutableArray *res=[NSMutableArray arrayWithCapacity:[files count]];
 	for(fileName in files)
 	{
-		
+		NSLog(@"fileName='%@'",fileName);
 		FSRef ref;
 		FSPathMakeRef((const UInt8 *)[fileName fileSystemRepresentation], &ref, NULL);
 		
@@ -278,7 +305,7 @@
 		NSDictionary *exifs=[metadata objectForKey:@"{Exif}"];
 		NSMutableString *dateS=[[exifs objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] mutableCopy];
 		[dateS replaceOccurrencesOfString:@":" withString:@"-" options:0 range:NSMakeRange(0, 10)];
-		[dateS appendString:[NSString stringWithFormat:@" %+05d",(([timeZone secondsFromGMT]*100)/3600)]];
+		[dateS appendString:@" +0000"];
 		
 		NSString *name=[fileName lastPathComponent];
 		NSString *url=[NSString stringWithFormat:@"file://%@",[[NSURL URLWithString:fileName] absoluteString]];
@@ -332,9 +359,6 @@
 	NSLog(@"-> %@",[self encode:-120.95-(-120.2)]);
 	NSLog(@"-> %@",[self encode:-126.453-(-120.95)]);
 	
-	[self setTimeZone:[NSTimeZone systemTimeZone]];
-	NSLog(@"timeZone -> %@ (%+05d)",timeZone,abs(([timeZone secondsFromGMT]*100)/3600));
-	
 	initUSB(self);
 	
 	rootArray = [NSMutableArray new];
@@ -362,6 +386,54 @@
 	//NSData *data=[NSData dataWithContentsOfFile:path];
 	NSString *html=[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
 	[[web mainFrame]loadHTMLString:html baseURL:[NSURL URLWithString:@"http://laullon.com"]];
+	
+	NSArray *timeZoneNames = [[[NSTimeZone abbreviationDictionary] allValues] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+	NSString *tzName;
+	[timeZones removeAllItems];
+	for(tzName in timeZoneNames){
+		[timeZones addItemWithTitle:tzName];
+	}
+	[timeZones setTitle:[[NSTimeZone localTimeZone] name]];
+	
+#ifdef DEBUG 
+	[self performSelectorInBackground:@selector(debugInit) withObject:nil];
+#endif 
+}
+
+-(void)debugInit
+{
+	//[self readFromGPXFile:@"/Users/laullon/Desktop/todo.gpx"];
+	[self readFromLogger];
+	NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Users/laullon/Desktop/pike_market" error:nil];
+	NSString *fileName;
+	NSMutableArray *files=[NSMutableArray arrayWithCapacity:[dirContents count]];
+	for(fileName in dirContents){
+		[files addObject:[NSString stringWithFormat:@"/Users/laullon/Desktop/pike_market/%@",fileName]];
+	}
+	[self addImagesFromDisk:files];
+}
+
+
+- (IBAction)updateTimeOffset:(id)sender{
+	int time=[timeOffset intValue];
+	char s=((time>=0)?'+':'-');
+	time=abs(time);
+	int h=time/60;
+	int m=time-(h*60);
+	NSString *st=[NSString stringWithFormat:@"%c%0#2d:%0#2d",s,h,m];
+	[timeOffsetTXT setStringValue:st];
+
+	NSLog(@"-> %@",sender);
+	NSLog(@"-> %@",[mainWindow currentEvent]);
+	
+	if(sender==timeZones){
+		[timeZones setTitle:[timeZones titleOfSelectedItem]];
+
+	}
+	
+	if([[mainWindow currentEvent] type]==NSLeftMouseUp){
+		[self positionImages];
+	}
 }
 
 -(NSString *)encode:(double)pos
@@ -600,12 +672,17 @@
 
 - (void)readFromGPXFile:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
 {
+	NSString *file=[panel filename];
+	[self performSelectorInBackground:@selector(readFromGPXFile:) withObject:file];
+}
+
+-(void)readFromGPXFile:(NSString *)file
+{
 	NSMutableArray *tmpPoints = [NSMutableArray new];
-	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSError *err=nil;
 	
-	NSString *file=[panel filename];
+	[self openProgress:@"Loading GPX File" count:0];
+	
 	NSLog(@"readFromGPXFile => file = '%@'",file);
 	NSURL *furl = [NSURL fileURLWithPath:file];
 	NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA) error:&err];
@@ -618,7 +695,11 @@
 	NSArray *trks=[[xmlDoc rootElement]elementsForName:@"trk"];
 	NSXMLElement *trk;
 	int n=0;
+	
+	[self openProgress:@"Loading GPX File" count:[NSNumber numberWithDouble:[trks count]]];
+	
 	for(trk in trks){
+		[progress incrementBy:1];
 		NSString *name=[NSString stringWithFormat:@" Track %d",[[tracks childNodes] count]];
 		NSArray *names=[trk elementsForName:@"name"];
 		if([names count]==1) name=[[names objectAtIndex:0] stringValue];
@@ -663,8 +744,7 @@
 	
 	
 	NSLog(@"readFromGPXFile => end");
-	[pool release];
-	
+	[self closeProgress];
 	points=[tmpPoints copy];
 	[points retain];
 	[tmpPoints release];
@@ -689,9 +769,7 @@
 	NSMutableArray *tmpPoints = [NSMutableArray new];
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	[NSApp beginSheet:readingSheet modalForWindow:mainWindow modalDelegate:self didEndSelector:nil contextInfo:nil];
-	
+		
 	Device *d=[Device alloc];
 	[d setDeviceName:[self devicePath]];
 	[d open];
@@ -734,8 +812,6 @@
 	
 	free(data);
 	[self parsePoints:tmpPoints];
-	[NSApp endSheet:readingSheet];
-	[readingSheet orderOut:self];
 	
 	[pool release];
 }
@@ -882,7 +958,7 @@
 	NSXMLDocument *xmlRequest = [NSXMLDocument documentWithRootElement:root];
 	
 	NSData *xml=[xmlRequest XMLDataWithOptions:NSXMLNodePrettyPrint];
-	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
+	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
 	
 	NSSavePanel *p=[NSSavePanel savePanel];
 	[p setRequiredFileType:@"gpx"];
@@ -930,8 +1006,8 @@
 	[root release];
 	
 	NSData *xml=[xmlRequest XMLDataWithOptions:NSXMLNodePrettyPrint];
-	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
-	
+	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
+
 	NSSavePanel *p=[NSSavePanel savePanel];
 	[p setRequiredFileType:@"kml"];
 	if([p runModal]==NSFileHandlingPanelOKButton)
@@ -1070,7 +1146,7 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 { 
 	/*ImageAndTextCell *imageAndTextCell = (ImageAndTextCell *)cell;
 	 // Set the image here since the value returned from outlineView:objectValueForTableColumn:... didn't specify the image part...
-	 //[imageAndTextCell setImage:[data iconRep]];
+	 [imageAndTextCell setTitle:@"ppppp"];
 	 
 	 NSLog(@"---------willDisplayCell---------");
 	 if([item isKindOfClass:[NSTreeNode class]]){
@@ -1079,6 +1155,6 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 	 NSLog(@"---------%@---------",[[item representedObject]class]);
 	 }
 	 NSLog(@"---------willDisplayCell---------");
-	 */
+	*/
 }
 @end

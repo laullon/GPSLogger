@@ -48,15 +48,15 @@
 	//[self listPhotos];
 	[self performSelector:@selector(listPhotos) withObject:nil];
 	//[self performSelectorInBackground:@selector(listPhotos) withObject:nil];
-
+	
 }
 
 -(void)listPhotos
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+	
 	[progress startAnimation:self];
-
+	
 	NSDictionary *set=[[collections selectedObjects] objectAtIndex:0];
 	NSArray *photos=[self getPhotosFromPhotoSet:[set objectForKey:@"id"]];
 	
@@ -71,20 +71,20 @@
 		[r addEntriesFromDictionary:[sizes objectAtIndex:0]];
 		[r setObject:self forKey:@"delegate"];
 		[res addObject:r];
-
+		
 		[progressText setObjectValue:[NSString stringWithFormat:@"%d / %d",[photos count],[res count]]];
 	}
 	
 	[res retain];
 	[pool release];
-
+	
 	[appController performSelector:addFotos withObject:res];
-
+	
 	[NSApp endSheet:panel];
 	[panel orderOut:self];
-
-
-
+	
+	
+	
 }
 
 -(NSArray *)getPhotosFromPhotoSet:(NSString *)set_id
@@ -133,25 +133,27 @@
 
 -(NSXMLDocument *)invokeFlickrService:(NSDictionary *)args
 {
-	NSError *error;
+    NSError *error=nil;
 	
 	NSURL *url=[NSURL URLWithString:[self prepareURLserviceWithSig:@"http://api.flickr.com/services/rest/" params:args]];
 	
-	NSXMLDocument *doc=[NSXMLDocument alloc];
-	[doc initWithContentsOfURL:url options:NSXMLDocumentTidyXML error:&error];
+	NSLog(@"invokeFlickrService url => %@",url);
 	
+	NSXMLDocument *doc=[[NSXMLDocument alloc] initWithContentsOfURL:url
+															options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
+															  error:&error];	
 	if(error)
 	{
-		NSLog(@"invokeFlickrService Error => %@",error);
-		NSLog(@"invokeFlickrService url => %@",url);
+		NSLog(@"%@:%s Error saving context: %@", [self class], _cmd, [error localizedDescription]);
 	}
+	NSLog(@"OK");
 	
 	NSXMLElement *root=[doc rootElement];
 	NSString *stat=[[root attributeForName:@"stat"]stringValue];
 	BOOL res=[stat isEqualToString:@"ok"];
 	if(!res){
 		NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
-		NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
+		NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
 	}
 	
 	return doc;
@@ -163,16 +165,23 @@
 	NSArray *titles=[doc objectsForXQuery:[NSString stringWithContentsOfFile:xq encoding:NSUTF8StringEncoding error:nil] error:&error];
 	if(error)
 	{
-		NSLog(@"transformXMLDocToArray Error => %@",error);
+		NSLog(@"%@:%s error: %@", [self class], _cmd, [error localizedDescription]);
 		NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
-		NSLog(@"transformXMLDocToArray XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
-		
+		NSLog(@"transformXMLDocToArray XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
+
 		return nil;
 	}
 	
 	NSMutableArray *res=[NSMutableArray arrayWithCapacity:[titles count]];
 	for(NSString *title in titles){
-		[res addObject:[title propertyList]];
+		NSLog(@"%@",title);
+		
+		@try {
+			[res addObject:[title propertyList]];
+		}
+		@catch (id exception) {
+			NSLog(@"main: Caught %@: %@", [exception name], [exception reason]);
+		}
 	}
 	return res;
 }
@@ -189,7 +198,8 @@
 	[doc initWithContentsOfURL:url options:NSXMLDocumentTidyXML error:&error];
 	
 	NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
-	NSLog(@"checkToken XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
+	NSLog(@"checkToken XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
+
 	NSXMLElement *root=[doc rootElement];
 	NSString *stat=[[root attributeForName:@"stat"]stringValue];
 	BOOL res=[stat isEqualToString:@"ok"];
@@ -215,8 +225,8 @@
 	[doc initWithContentsOfURL:url options:NSXMLDocumentTidyXML error:&error];
 	
 	NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
-	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
-	
+	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
+
 	NSXMLElement *root=[doc rootElement];
 	NSString *stat=[[root attributeForName:@"stat"]stringValue];
 	if([stat isEqualToString:@"ok"]){
@@ -240,8 +250,8 @@
 	[doc initWithContentsOfURL:url options:NSXMLDocumentTidyXML error:&error];
 	
 	NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
-	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes]]);
-	
+	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
+
 	NSXMLElement *root=[doc rootElement];
 	NSString *stat=[[root attributeForName:@"stat"]stringValue];
 	if([stat isEqualToString:@"ok"]){
@@ -306,7 +316,7 @@
 	NSString *folder = @"~/Library/Application Support/GPSLogger/";
 	folder = [folder stringByExpandingTildeInPath];
 	if ([fileManager fileExistsAtPath: folder] == NO) {
-		[fileManager createDirectoryAtPath: folder attributes: nil];
+		[fileManager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:nil];
 	} 
 	NSString *fileName = @"GPSLogger.flickr";
 	return [folder stringByAppendingPathComponent: fileName]; 

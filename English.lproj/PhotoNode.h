@@ -19,6 +19,7 @@
 	NSDate* date;
 	GPSPoint* gpsPoint;
 	NSString* name;
+	NSString* dateO;
 	NSString* width;
 	NSString* height;
 	id delegate;
@@ -30,6 +31,7 @@
 
 @property (copy) NSString* name;
 @property (copy) NSString* width;
+@property (copy) NSString* dateO;
 @property (copy) NSString* height;
 @property (copy) NSURL* URL;
 @property (copy) NSDate* date;
