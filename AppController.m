@@ -848,8 +848,10 @@
 			NSLog(@"TrackNode %d-%d (%d)",[tn startPoint],[tn endPoint],[[tn mutableChildNodes]count]);
 			
 			[[tracks mutableChildNodes] addObject:tn];
+			
 			name=[NSString stringWithFormat:@" Track %d",[[tracks mutableChildNodes] count]];
-			tn=[TrackNode treeNodeWithRepresentedObject:name];
+			tn=[TrackNode treeNodeWithRepresentedObject:[gp getAddress:name]];
+			
 			[tn setStartPoint:n];
 			name=[NSString stringWithFormat:@" Ini. WayPoint"];
 			nodo=[PointNode treeNodeWithRepresentedObject:name];
@@ -873,7 +875,6 @@
 	[[tn mutableChildNodes] addObject:nodo];
 	
 	[[tracks mutableChildNodes] addObject:tn];
-	
 	
 	[self positionImages];
 	

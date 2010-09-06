@@ -30,5 +30,6 @@
 @property (assign) TrackNode *track;
 
 - (NSComparisonResult)compare:(GPSPoint *)anotherGPSPoint;
-
+-(NSString *)getAddress:(NSString *)alt;
+- (NSString *)prepareURL:(NSString *)url params:(NSDictionary *)args;
 @end
