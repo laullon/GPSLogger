@@ -22,6 +22,7 @@
 
 @synthesize statusBar;
 @synthesize devicePath;
+@synthesize selectedPhoto;
 
 #define FLICKR_BT 1
 #define DISCK_BT 2
@@ -255,6 +256,10 @@
 		[args addObject:[point latitud]];
 		[args addObject:[point longitud]];
 		[win callWebScriptMethod:@"addPhoto" withArguments:args];
+		
+		if(selectedPhoto!=nil){
+			[self selectPhoto:selectedPhoto];
+		}
 	}
 }
 
@@ -305,7 +310,7 @@
 		NSDictionary *exifs=[metadata objectForKey:@"{Exif}"];
 		NSMutableString *dateS=[[exifs objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] mutableCopy];
 		[dateS replaceOccurrencesOfString:@":" withString:@"-" options:0 range:NSMakeRange(0, 10)];
-		[dateS appendString:@" +0000"];
+		//[dateS appendString:@" +0000"];
 		
 		NSString *name=[fileName lastPathComponent];
 		NSString *url=[NSString stringWithFormat:@"file://%@",[[NSURL URLWithString:fileName] absoluteString]];
@@ -375,18 +380,27 @@
 	
 	[links setContent:rootArray];
 	
+	/*[web setUIDelegate:self];
+	[web setFrameLoadDelegate:self];
+	[web setResourceLoadDelegate:self];*/
+
+	NSError *error=nil;
 	NSString *path=[[NSBundle mainBundle] pathForResource:@"mapa" ofType:@"html"];
+	NSString *html=[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
+	if(error)
+	{
+		NSLog(@"%@:%s loading html: %@", [self class], _cmd, [error localizedDescription]);
+	}
+	NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:html]];
+	//[[web mainFrame] loadRequest:request];	
+	[[web mainFrame] loadHTMLString:html baseURL:[NSURL URLWithString:@"http://laullon.com"]];	
 	
 	[[web preferences] setPlugInsEnabled:NO];
 	[[web preferences] setJavaEnabled:NO];
 	
 	NSLog(@"p -->%@",[[web preferences] arePlugInsEnabled]);
 	NSLog(@"j -->%@",[[web preferences] isJavaEnabled]);
-	
-	//NSData *data=[NSData dataWithContentsOfFile:path];
-	NSString *html=[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-	[[web mainFrame]loadHTMLString:html baseURL:[NSURL URLWithString:@"http://laullon.com"]];
-	
+		
 	NSArray *timeZoneNames = [[[NSTimeZone abbreviationDictionary] allValues] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 	NSString *tzName;
 	[timeZones removeAllItems];
@@ -525,18 +539,10 @@
 			[self updateWayPoint:(PointNode *)node];
 		}else if([node isKindOfClass:[TrackNode class]]){
 			[self updateTrack:(TrackNode *)node];
-			//}else if([node isKindOfClass:[PhotoNode class]]){
-			//[self showPhoto:(PhotoNode *)node];
+		}else if([node isKindOfClass:[PhotoNode class]]){
+			[self selectPhoto:(PhotoNode *)node];
 		}
-		/*	}else if([sender isKindOfClass:[NSTableView class]])
-		 {
-		 GPSPoint *point=[[datos selectedObjects] objectAtIndex:0];*/
 	}
-}
-
-- (void)showPhoto:(PhotoNode *)node
-{
-	[self setSelectedPhoto:[[[node gpsPoint] index] intValue]];
 }
 
 - (void)updateWayPoint:(PointNode *)node
@@ -557,15 +563,17 @@
 	[win evaluateWebScript:cmd];
 }
 
-- (void)setSelectedPhoto:(int)index
+- (void)selectPhoto:(PhotoNode *)ph
 {
-	[self setSelectedPoint:index];
-	selectedPhoto=index;
-	GPSPoint *point = [points objectAtIndex:selectedPhoto];	
-	NSString *cmd=[NSString stringWithFormat:@"setPoint(%@, %@)",[point latitud],[point longitud]];
+	NSImage *img=[[NSImage alloc] initByReferencingURL:[ph URL]];
+	[imageViewer setImage:img];
+	selectedPhoto=ph;
 	
-	id win = [web windowScriptObject];	
-	[win evaluateWebScript:cmd];
+	GPSPoint *point=[selectedPhoto gpsPoint];
+	NSMutableArray *args = [NSMutableArray new];
+	[args addObject:[point latitud]];
+	[args addObject:[point longitud]];
+	[[web windowScriptObject] callWebScriptMethod:@"movePhotoIcon" withArguments:args];
 }
 
 - (NSDictionary *)encodeTrack:(int)ini to:(int)fin
@@ -621,16 +629,20 @@
 	if(node==selectedTrack) return;
 	selectedTrack=node;
 	
-	//NSLog(@"TrackNode %d-%d",[node startPoint],[node endPoint]);
-	
-	NSDictionary *trackEncoded=[self encodeTrack:[node startPoint] to:[node endPoint]];
+	int ini=[node startPoint];
+	int fin=[node endPoint];
+	NSLog(@"updateTrack ini:%d fin:%d",ini,fin);
 	
 	id win = [web windowScriptObject];	
 	NSMutableArray *args = [NSMutableArray new];
-	[args addObject:[trackEncoded objectForKey:@"polyline"]];
-	[args addObject:[trackEncoded objectForKey:@"leves"]];
+	NSMutableArray *p = [NSMutableArray new];
+	for(;ini<=fin;ini++){
+		GPSPoint *point = [points objectAtIndex:ini];
+		[p addObject:[point latitud]];
+		[p addObject:[point longitud]];
+	}	
+	[args addObject:p];
 	[win callWebScriptMethod:@"setTrak" withArguments:args];
-	//[self setSelectedPoint:[node startPoint]];	
 }
 
 - (IBAction)readFromLoggerAction:(id)sender
@@ -1128,18 +1140,16 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)selector
 {
-    if ( selector == @selector(hola:) ) {
+    if ( selector == @selector(selectPhotoById:) ) {
         return NO;
     }
     return YES;
 }
 
-- (NSString *)hola:(NSString *)txt
+- (void)selectPhotoById:(NSString *)txt
 {
 	PhotoNode *ph=[photosByName objectForKey:txt];
-	NSString *res=[NSString stringWithFormat:@"<img src=\"%@\" width=\"%@\" height=\"%@\"/>",[[ph URL] absoluteString],[ph width],[ph height]]; 
-	NSLog(@"html='%@'",res);
-	return res;
+	[self selectPhoto:ph];
 }
 
 //**************************//
@@ -1157,5 +1167,9 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 	 }
 	 NSLog(@"---------willDisplayCell---------");
 	*/
+}
+
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame{
+	NSLog(@"--didFinishLoadForFrame-- %@",sender);
 }
 @end

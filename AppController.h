@@ -35,6 +35,8 @@
 	IBOutlet NSButton *iniLock;
 	IBOutlet NSButton *finLock;
 	
+	IBOutlet NSImageView *imageViewer;
+	
 	IBOutlet NSForm *deviceInfo;
 	
 	IBOutlet GLFlickr *flickr;
@@ -46,7 +48,7 @@
 	NSTreeNode *photos;
 	
 	int selectedPoint;
-	int selectedPhoto;
+	PhotoNode *selectedPhoto;
 	int iniMapaPoint;
 	int finMapaPoint;
 	TrackNode *selectedTrack;
@@ -60,6 +62,7 @@
 
 @property (readonly) NSTextFieldCell *statusBar;
 @property (copy) NSString *devicePath;
+@property PhotoNode *selectedPhoto;
 
 - (void)addImages:(NSArray *)arrayPhotos;
 
@@ -94,10 +97,8 @@
 - (IBAction)updateView:(id)sender;
 - (void)updateTrack:(TrackNode *)node;
 - (void)updateWayPoint:(PointNode *)node;
-- (void)showPhoto:(PhotoNode *)node;
 
 - (void)setSelectedPoint:(int)index;
-- (void)setSelectedPhoto:(int)index;
 
 - (void)awakeFromNib;
 - (NSProgressIndicator *)progress;
@@ -120,7 +121,9 @@
 - (void)webView:(WebView *)sender didClearWindowObject:(WebScriptObject *)windowObject forFrame:(WebFrame *)frame;
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)selector;
 
-- (NSString *)hola:(NSString *)txt;
+- (void)selectPhotoById:(NSString *)txt;
+- (void)selectPhoto:(PhotoNode *)ph;
+
 - (void)readData:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)readFromGPXFile:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo;
 - (void)readFromGPXFile:(NSString *)file;
