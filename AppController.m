@@ -349,6 +349,14 @@
 	return nil;
 }
 
+- (IBAction)setPrecisionOffSet:(id)sender{
+	int limit=[sender tag];
+	limit=(limit*60)/2;
+	[timeOffset setMaxValue:limit];
+	[timeOffset setMinValue:(limit*-1)];
+	[timeOffset setIntValue:0];
+}
+
 - (void)awakeFromNib
 {	
 	/*sISO8601 = [[NSDateFormatter alloc] init];
@@ -380,10 +388,6 @@
 	
 	[links setContent:rootArray];
 	
-	/*[web setUIDelegate:self];
-	[web setFrameLoadDelegate:self];
-	[web setResourceLoadDelegate:self];*/
-
 	NSError *error=nil;
 	NSString *path=[[NSBundle mainBundle] pathForResource:@"mapa" ofType:@"html"];
 	NSString *html=[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
@@ -391,8 +395,6 @@
 	{
 		NSLog(@"%@:%s loading html: %@", [self class], _cmd, [error localizedDescription]);
 	}
-	NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:html]];
-	//[[web mainFrame] loadRequest:request];	
 	[[web mainFrame] loadHTMLString:html baseURL:[NSURL URLWithString:@"http://laullon.com"]];	
 	
 	[[web preferences] setPlugInsEnabled:NO];
@@ -570,10 +572,12 @@
 	selectedPhoto=ph;
 	
 	GPSPoint *point=[selectedPhoto gpsPoint];
-	NSMutableArray *args = [NSMutableArray new];
-	[args addObject:[point latitud]];
-	[args addObject:[point longitud]];
-	[[web windowScriptObject] callWebScriptMethod:@"movePhotoIcon" withArguments:args];
+	if(point!=nil){
+		NSMutableArray *args = [NSMutableArray new];
+		[args addObject:[point latitud]];
+		[args addObject:[point longitud]];
+		[[web windowScriptObject] callWebScriptMethod:@"movePhotoIcon" withArguments:args];
+	}
 }
 
 - (NSDictionary *)encodeTrack:(int)ini to:(int)fin

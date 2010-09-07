@@ -62,13 +62,15 @@
 
 @property (readonly) NSTextFieldCell *statusBar;
 @property (copy) NSString *devicePath;
-@property PhotoNode *selectedPhoto;
+@property (assign) PhotoNode *selectedPhoto;
 
 - (void)addImages:(NSArray *)arrayPhotos;
 
 - (IBAction)readFromLoggerAction:(id)sender;
 - (IBAction)addImagesAction:(id)sender;
 - (IBAction)noveSelectedPoind:(id)sender;
+
+- (IBAction)setPrecisionOffSet:(id)sender;
 
 - (void)_applyGeoTags:(PhotoNode *)photo;
 - (BOOL)setDateDigitized:(GPSPoint *)date forPhotoWithURL:(NSURL *)URL;
