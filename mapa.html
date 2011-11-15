@@ -46,6 +46,9 @@
 			
 			
 			var track;
+						var fotos=new google.maps.MVCArray();
+
+
 			function load() {
 				var latlng = new google.maps.LatLng(32.713273,-117.175686);
 				var myOptions = {
@@ -75,6 +78,7 @@
 				return bounds;   
 			}
 			
+			
 			function setTrak(points) {
 			    try{
 					var path = [];
@@ -102,8 +106,13 @@
 				map.panTo(p);
 			}
 			
-			var fotos=[];
-
+			
+			function showAllPhotos(){
+				var bounds = new google.maps.LatLngBounds();
+				fotos.forEach( function(marker) { bounds.extend(marker.getPosition()); } ); 
+				map.fitBounds(bounds);
+			}
+			
 			function clearPhotos(){
 				while(fotos.length){
 					var marker=fotos.pop();
@@ -114,7 +123,7 @@
 			function addPhoto(name,lat,long){
 				var p=new google.maps.LatLng(lat, long);
 				var marker=addMarker(name,p,pointIcon);
-				fotos.push(marker);
+				//fotos.push(marker);
 				google.maps.event.addListener(marker, 'click', function() { window.appController.selectPhotoById_(name); });
 			}
 			
@@ -139,7 +148,7 @@
 				wayPoint=center(lat,long);
 			}
 			
-
+			
 			
 			
 			function center(lat,long){

@@ -53,8 +53,6 @@
 
 -(void)listPhotos
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
 	[progress startAnimation:self];
 	
 	NSDictionary *set=[[collections selectedObjects] objectAtIndex:0];
@@ -76,7 +74,6 @@
 	}
 	
 	[res retain];
-	[pool release];
 	
 	[appController performSelector:addFotos withObject:res];
 	
@@ -289,7 +286,7 @@
 
 - (NSString *)prepareURLParamsString:(NSDictionary *)args
 {
-	NSMutableString *res=[[NSMutableString alloc] init];
+	NSMutableString *res=[[[NSMutableString alloc] init] retain];
 	[res appendFormat:@"api_key=%@",KEY];
 	for(id key in args)
 		[res appendFormat:@"&%@=%@",key,[args objectForKey:key]];

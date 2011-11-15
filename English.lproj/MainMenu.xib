@@ -21,9 +21,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1037"/>
-			<integer value="582"/>
 			<integer value="1071"/>
+			<integer value="1037"/>
+			<integer value="503"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2148,14 +2148,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">reload:</string>
-						<reference key="source" ref="745567090"/>
-						<reference key="destination" ref="823274676"/>
-					</object>
-					<int key="connectionID">1036</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFront:</string>
 						<reference key="source" ref="699946872"/>
 						<reference key="destination" ref="616761961"/>
@@ -2265,6 +2257,14 @@
 						<reference key="destination" ref="351999868"/>
 					</object>
 					<int key="connectionID">1085</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showAllPhotosOnMap:</string>
+						<reference key="source" ref="1048015076"/>
+						<reference key="destination" ref="823274676"/>
+					</object>
+					<int key="connectionID">1086</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3445,7 +3445,7 @@
 					<integer value="0"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{2062, 879}, {617, 0}}</string>
+					<string>{{2063, 745}, {616, 227}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3548,7 +3548,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1085</int>
+			<int key="maxID">1086</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3569,11 +3569,13 @@
 							<string>setFinMapPointAction:</string>
 							<string>setIniMapPointAction:</string>
 							<string>setPrecisionOffSet:</string>
+							<string>showAllPhotosOnMap:</string>
 							<string>updateTimeOffset:</string>
 							<string>updateView:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3600,6 +3602,7 @@
 							<string>setFinMapPointAction:</string>
 							<string>setIniMapPointAction:</string>
 							<string>setPrecisionOffSet:</string>
+							<string>showAllPhotosOnMap:</string>
 							<string>updateTimeOffset:</string>
 							<string>updateView:</string>
 						</object>
@@ -3639,6 +3642,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">setPrecisionOffSet:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">showAllPhotosOnMap:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4942,7 +4949,7 @@
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1050" key="NS.object.0"/>
+			<integer value="1060" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>

@@ -91,7 +91,7 @@ NSFileHandle *device;
 	
 	NSString *time = (ds->time!=0xffffffff)? [NSString stringWithFormat:@"%d sec",ds->time] :  @"N/A";
 	NSString *distance = (ds->distance!=0xffffffff)? [NSString stringWithFormat:@"%d",ds->distance] :  @"N/A";
-	NSString *sensitivy = [sense objectAtIndex:ds->sensitivy];
+	NSString *sensitivy = (ds->sensitivy>=0) ? [sense objectAtIndex:ds->sensitivy] : @"--";
 	NSString *tag=(ds->tag==1)? @"On" : @"Off";
 	NSString *vMin = (ds->vMin!=0)? [NSString stringWithFormat:@"%d Km/h",(ds->vMin*1.852)] :  @"N/A";
 
@@ -131,7 +131,7 @@ NSFileHandle *device;
 			[dp_data appendData:data];
 			[progress setDoubleValue:[dp_data length]];
 		}else{
-			NSString *m = [NSString stringWithCString:[[data subdataWithRange:NSMakeRange(0,14)] bytes] length:14];
+			NSString *m = [NSString stringWithCString:[[data subdataWithRange:NSMakeRange(0,14)] bytes] encoding:NSASCIIStringEncoding];
 			NSLog(@"-%@-",m);
 			if([@"WP Update Over" isEqualToString:m])
 				fin=true;
@@ -154,19 +154,19 @@ NSFileHandle *device;
 	
 	if (ioctl(fileDescriptor, TIOCEXCL) == -1)		
     {		
-        printf("Error setting TIOCEXCL on %s - %s(%d).\n",deviceName, strerror(errno), errno);		
+        printf("Error setting TIOCEXCL on %s - %s(%d).\n",[deviceName cStringUsingEncoding:NSASCIIStringEncoding], strerror(errno), errno);		
 		exit(-1);
     }
 	
 	if (fcntl(fileDescriptor, F_SETFL, 0) == -1)
     {
-        printf("Error clearing O_NONBLOCK %s - %s(%d).\n", deviceName, strerror(errno), errno);
+        printf("Error clearing O_NONBLOCK %s - %s(%d).\n", [deviceName cStringUsingEncoding:NSASCIIStringEncoding], strerror(errno), errno);
 		exit(-1);
     }
 	
 	if (tcgetattr(fileDescriptor, &gOriginalTTYAttrs) == -1)
     {
-		printf("Error getting tty attributes %s - %s(%d).\n", deviceName, strerror(errno), errno);
+		printf("Error getting tty attributes %s - %s(%d).\n", [deviceName cStringUsingEncoding:NSASCIIStringEncoding], strerror(errno), errno);
 		exit(-1);
     }
 	
@@ -180,7 +180,7 @@ NSFileHandle *device;
 	
 	if (tcsetattr(fileDescriptor, TCSANOW, &options) == -1)		
     {		
-        printf("Error setting tty attributes %s - %s(%d).\n", deviceName, strerror(errno), errno);
+        printf("Error setting tty attributes %s - %s(%d).\n", [deviceName cStringUsingEncoding:NSASCIIStringEncoding], strerror(errno), errno);
 		exit(-1);
     }
 	NSLog(@"Input baud rate changed to %d\n", (int) cfgetispeed(&options));

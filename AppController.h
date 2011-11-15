@@ -75,6 +75,7 @@
 - (void)_applyGeoTags:(PhotoNode *)photo;
 - (BOOL)setDateDigitized:(GPSPoint *)date forPhotoWithURL:(NSURL *)URL;
 
+- (IBAction)showAllPhotosOnMap:(id)sender;
 - (IBAction)applyGeoTags:(id)sender;
 - (void)applyGeoTags;
 

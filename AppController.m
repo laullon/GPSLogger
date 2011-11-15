@@ -214,7 +214,7 @@
 {
 	NSTimeZone *tz=[NSTimeZone timeZoneWithName:[timeZones titleOfSelectedItem]];
 	NSNumber *off=[NSNumber numberWithInt:[timeOffset intValue]];
-	NSLog(@"positionImages");
+	NSLog(@"positionImages start");
 	NSLog(@"off='%@'", off);
 	
 	if([points count]==0) return;
@@ -231,6 +231,7 @@
 	NSDateFormatter *df=[[NSDateFormatter alloc] init];
 	[df setDateFormat:@"yyyy-MM-dd HH:mm:ss z"];
 	
+	int c=0;
 	[win callWebScriptMethod:@"clearPhotos" withArguments:nil];
 	for(PhotoNode *photo in [photos childNodes]){
 
@@ -243,6 +244,7 @@
 		GPSPoint *point=[self findPoint:date ini:0 fin:([points count]-1)];
 		[photo setGpsPoint:point];		
 
+		NSLog(@"foto: %d-%d",++c,[[photos childNodes] count]);
 		NSLog(@"         tz: '%@'",tz);
 		NSLog(@"photo.dateO: '%@'",[photo dateO]);
 		NSLog(@"      dateS: '%@'",dateS);
@@ -256,11 +258,13 @@
 		[args addObject:[point latitud]];
 		[args addObject:[point longitud]];
 		[win callWebScriptMethod:@"addPhoto" withArguments:args];
+		NSLog(@"foto: %d-%d OK",++c,[[photos childNodes] count]);
 		
 		if(selectedPhoto!=nil){
 			[self selectPhoto:selectedPhoto];
 		}
 	}
+	NSLog(@"positionImages start");
 }
 
 - (void)addImages:(NSArray *)arrayPhotos
@@ -410,7 +414,8 @@
 		[timeZones addItemWithTitle:tzName];
 	}
 	[timeZones setTitle:[[NSTimeZone localTimeZone] name]];
-	
+	[timeZones selectItemWithTitle:[[NSTimeZone localTimeZone] name]];
+
 #ifdef DEBUG 
 	[self performSelectorInBackground:@selector(debugInit) withObject:nil];
 #endif 
@@ -419,7 +424,7 @@
 -(void)debugInit
 {
 	//[self readFromGPXFile:@"/Users/laullon/Desktop/todo.gpx"];
-	[self readFromLogger];
+	//[self readFromLogger];
 	NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Users/laullon/Desktop/pike_market" error:nil];
 	NSString *fileName;
 	NSMutableArray *files=[NSMutableArray arrayWithCapacity:[dirContents count]];
@@ -427,6 +432,7 @@
 		[files addObject:[NSString stringWithFormat:@"/Users/laullon/Desktop/pike_market/%@",fileName]];
 	}
 	[self addImagesFromDisk:files];
+	//[self showAllPhotosOnMap:nil];
 }
 
 
@@ -579,6 +585,11 @@
 		[[web windowScriptObject] callWebScriptMethod:@"movePhotoIcon" withArguments:args];
 	}
 }
+
+- (IBAction)showAllPhotosOnMap:(id)sender{
+	[[web windowScriptObject] callWebScriptMethod:@"showAllPhotos" withArguments:nil];
+}
+
 
 - (NSDictionary *)encodeTrack:(int)ini to:(int)fin
 {
@@ -1155,6 +1166,7 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 	PhotoNode *ph=[photosByName objectForKey:txt];
 	[self selectPhoto:ph];
 }
+
 
 //**************************//
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(NSCell *)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
