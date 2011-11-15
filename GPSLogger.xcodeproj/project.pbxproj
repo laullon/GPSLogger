@@ -13,7 +13,6 @@
 		3153932C0E96B5F500118C54 /* PhotoNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 3153932B0E96B5F500118C54 /* PhotoNode.m */; };
 		316AA86D0E94AF9600CFE410 /* mapa.html in Resources */ = {isa = PBXBuildFile; fileRef = 316AA86C0E94AF9600CFE410 /* mapa.html */; };
 		317FCEE00E8E00D1006EA6A3 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = 317FCEDF0E8E00D1006EA6A3 /* Device.m */; };
-		319F0D5F14732C9400173EE5 /* MyNSView.m in Sources */ = {isa = PBXBuildFile; fileRef = 319F0D5E14732C9400173EE5 /* MyNSView.m */; };
 		31AA74E30E95C83D003E37E7 /* PointNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 31AA74E20E95C83D003E37E7 /* PointNode.m */; };
 		31AA76CE0E95F649003E37E7 /* TrackNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 31AA76CD0E95F649003E37E7 /* TrackNode.m */; };
 		31B376790E9B3640006C3056 /* ControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31B376780E9B3640006C3056 /* ControlController.m */; };
@@ -48,8 +47,6 @@
 		316AA86C0E94AF9600CFE410 /* mapa.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = mapa.html; sourceTree = "<group>"; };
 		317FCEDE0E8E00D1006EA6A3 /* Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
 		317FCEDF0E8E00D1006EA6A3 /* Device.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
-		319F0D5D14732C9300173EE5 /* MyNSView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyNSView.h; sourceTree = "<group>"; };
-		319F0D5E14732C9400173EE5 /* MyNSView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyNSView.m; sourceTree = "<group>"; };
 		31AA74E10E95C83D003E37E7 /* PointNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointNode.h; sourceTree = "<group>"; };
 		31AA74E20E95C83D003E37E7 /* PointNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PointNode.m; sourceTree = "<group>"; };
 		31AA76CC0E95F649003E37E7 /* TrackNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackNode.h; sourceTree = "<group>"; };
@@ -171,8 +168,6 @@
 				31C2251E0EA85FE6000C97F1 /* GLFlickr.m */,
 				31EBA9000ED3F75E006F4885 /* PreferencesController.h */,
 				31EBA9010ED3F75E006F4885 /* PreferencesController.m */,
-				319F0D5D14732C9300173EE5 /* MyNSView.h */,
-				319F0D5E14732C9400173EE5 /* MyNSView.m */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -289,7 +284,6 @@
 				31C2251F0EA85FE6000C97F1 /* GLFlickr.m in Sources */,
 				31B5F25A0EB595B7008CD615 /* ImageAndTextCell.m in Sources */,
 				31EBA9020ED3F75E006F4885 /* PreferencesController.m in Sources */,
-				319F0D5F14732C9400173EE5 /* MyNSView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
