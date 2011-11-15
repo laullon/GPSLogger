@@ -73,7 +73,6 @@
 		[progressText setObjectValue:[NSString stringWithFormat:@"%d / %d",[photos count],[res count]]];
 	}
 	
-	[res retain];
 	
 	[appController performSelector:addFotos withObject:res];
 	
@@ -141,7 +140,7 @@
 															  error:&error];	
 	if(error)
 	{
-		NSLog(@"%@:%s Error saving context: %@", [self class], _cmd, [error localizedDescription]);
+		NSLog(@"%@:%@ Error saving context: %@", [self class], NSStringFromSelector(_cmd), [error localizedDescription]);
 	}
 	NSLog(@"OK");
 	
@@ -286,7 +285,7 @@
 
 - (NSString *)prepareURLParamsString:(NSDictionary *)args
 {
-	NSMutableString *res=[[[NSMutableString alloc] init] retain];
+	NSMutableString *res=[[NSMutableString alloc] init];
 	[res appendFormat:@"api_key=%@",KEY];
 	for(id key in args)
 		[res appendFormat:@"&%@=%@",key,[args objectForKey:key]];

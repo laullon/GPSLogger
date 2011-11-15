@@ -17,12 +17,12 @@
 @interface PhotoNode : LinksNode {
 	NSURL* URL;
 	NSDate* date;
-	GPSPoint* gpsPoint;
+	GPSPoint* __weak gpsPoint;
 	NSString* name;
 	NSString* dateO;
 	NSString* width;
 	NSString* height;
-	id delegate;
+	id __unsafe_unretained delegate;
 	NSDictionary *auxProperties;
 }
 
@@ -35,8 +35,8 @@
 @property (copy) NSString* height;
 @property (copy) NSURL* URL;
 @property (copy) NSDate* date;
-@property (assign) GPSPoint* gpsPoint;
-@property (assign) id delegate;
+@property (weak) GPSPoint* gpsPoint;
+@property (unsafe_unretained) id delegate;
 @property (copy) NSDictionary *auxProperties;
 
 @end

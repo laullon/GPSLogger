@@ -42,7 +42,7 @@
 															  error:&error];	
 	if(error)
 	{
-		NSLog(@"%@:%s Error saving context: %@", [self class], _cmd, [error localizedDescription]);
+		NSLog(@"%@:%@ Error saving context: %@", [self class], NSStringFromSelector(_cmd), [error localizedDescription]);
 	}
 	
 	NSString *xq=[[NSBundle mainBundle] pathForResource:@"google_city" ofType:@"xq"];
@@ -52,7 +52,7 @@
 	{
 		NSData *xml=[doc XMLDataWithOptions:NSXMLNodePrettyPrint];
 		NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
-		NSLog(@"%@:%s error: %@", [self class], _cmd, [error localizedDescription]);
+		NSLog(@"%@:%@ error: %@", [self class], NSStringFromSelector(_cmd), [error localizedDescription]);
 		return alt;
 	}
 	if([cities count]>0){

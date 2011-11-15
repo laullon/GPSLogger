@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "GPSPoint.h"; 
+#import "GPSPoint.h"
 
 
 @interface ControlController : NSObject {

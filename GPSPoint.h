@@ -17,7 +17,7 @@
 	NSNumber *altitud;
 	NSNumber *velocidad;
 	NSNumber *tag;
-	TrackNode *track;
+	TrackNode *__weak track;
 }
 
 @property (copy) NSNumber *index;
@@ -27,7 +27,7 @@
 @property (copy) NSNumber *altitud;
 @property (copy) NSNumber *velocidad;
 @property (copy) NSNumber *tag;
-@property (assign) TrackNode *track;
+@property (weak) TrackNode *track;
 
 - (NSComparisonResult)compare:(GPSPoint *)anotherGPSPoint;
 -(NSString *)getAddress:(NSString *)alt;

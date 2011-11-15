@@ -26,6 +26,8 @@
 -(NSString *)test;
 -(void)close;
 
+@end
+
 IONotificationPortRef notePort;
 CFRunLoopSourceRef runLoopSource;
 io_iterator_t addedIter;

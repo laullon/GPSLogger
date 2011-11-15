@@ -38,8 +38,8 @@
 	NSLog(@"PreferencesController hide");
 	NSNumber *off=[NSNumber numberWithInt:((([MM intValue]*60)+([HH intValue]*3600)+[SS intValue]))*-1];
 	//[appController timeOffSet:off];
-	[appController performSelector:@selector(setTimeOffSet:) withObject:off];
-	[appController performSelector:@selector(positionImages)];
+//	[appController performSelector:@selector(setTimeOffSet:) withObject:off];
+//	[appController performSelector:@selector(positionImages)];
 
 	[NSApp endSheet:panel];
 	[panel orderOut:self];

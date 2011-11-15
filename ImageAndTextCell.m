@@ -56,10 +56,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [image release];
-    [super dealloc];
-}
 
 - (id)copyWithZone:(NSZone *)zone {
     ImageAndTextCell *cell = (ImageAndTextCell *)[super copyWithZone:zone];

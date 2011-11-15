@@ -34,7 +34,7 @@ NSFileHandle *device;
 		data=[device availableData];
 		if([data length]==0) break;
 		
-		NSLog(@"read %d bytes",[data length]);
+		NSLog(@"read %lu bytes",[data length]);
 		NSLog(@"%@",[data description]);
 		
 		[dp_data appendData:data];
@@ -62,7 +62,7 @@ NSFileHandle *device;
 	[res replaceOccurrencesOfString:@"\r\n" withString:@"" options:0 range:NSMakeRange(0,[res length])];
 	[res replaceOccurrencesOfString:@"\0" withString:@" " options:0 range:NSMakeRange(0,[res length])];
 	
-	NSLog(@"txt = %@ (%d)",res,[res length]);
+	NSLog(@"txt = %@ (%lu)",res,[res length]);
 	NSLog(@"<= test");
 	return res;
 }
@@ -84,7 +84,7 @@ NSFileHandle *device;
 	
 	NSData *raw_data=[self readData:271];	
 	DeviceSettings *ds=malloc(sizeof(DeviceSettings));
-	NSLog(@"%d - %d",sizeof(DeviceSettings),[raw_data length]);
+	NSLog(@"%lu - %lu",sizeof(DeviceSettings),[raw_data length]);
 	[raw_data getBytes:ds];
 	
 	NSArray *sense = [NSArray arrayWithObjects: @"disabled", @"middle", @"high", @"low", nil];

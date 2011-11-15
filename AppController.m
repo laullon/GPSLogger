@@ -73,7 +73,7 @@
 
 - (BOOL)setDateDigitized:(GPSPoint *)point forPhotoWithURL:(NSURL *)URL;
 {
-    CGImageSourceRef source = CGImageSourceCreateWithURL( (CFURLRef) URL,NULL);
+    CGImageSourceRef source = CGImageSourceCreateWithURL( (__bridge CFURLRef) URL,NULL);
     if (!source)
     {
         NSLog(@"***Could not create image source ***");
@@ -85,7 +85,7 @@
     
     //make the metadata dictionary mutable so we can add properties to it
     //NSMutableDictionary *metadataAsMutable = [[metadata mutableCopy]autorelease];
-    NSMutableDictionary *metadataAsMutable = [[NSMutableDictionary dictionaryWithCapacity:10]autorelease];
+    NSMutableDictionary *metadataAsMutable = [NSMutableDictionary dictionaryWithCapacity:10];
 	NSMutableDictionary *EXIFDictionary = [NSMutableDictionary dictionary];
     //[metadata release];
     
@@ -138,7 +138,7 @@
     //this will be the data CGImageDestinationRef will write into
     NSMutableData *data = [NSMutableData data];
     
-    CGImageDestinationRef destination = CGImageDestinationCreateWithData((CFMutableDataRef)data,UTI,1,NULL);
+    CGImageDestinationRef destination = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,UTI,1,NULL);
     
     if(!destination)
     {
@@ -147,7 +147,7 @@
     }
     
     //add the image contained in the image source to the destination, overidding the old metadata with our modified metadata
-    CGImageDestinationAddImageFromSource(destination,source,0, (CFDictionaryRef) metadataAsMutable);
+    CGImageDestinationAddImageFromSource(destination,source,0, (__bridge CFDictionaryRef) metadataAsMutable);
     
     //tell the destination to write the image data and metadata into our data object.
     //It will return false if something goes wrong
@@ -179,19 +179,19 @@
 
 - (void)applyGeoTags
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	@autoreleasepool {
 	
-	[progressText setStringValue:@"Applying GeoTags"];
-	[progress setIndeterminate:NO];
-	[progress setMaxValue:[[photos childNodes] count]];
-	[progress setDoubleValue:0];
-	
-	for(PhotoNode *photo in [photos childNodes]){
-		[progress incrementBy:1];
-		[photo applyGeoTags];
-	}
+		[progressText setStringValue:@"Applying GeoTags"];
+		[progress setIndeterminate:NO];
+		[progress setMaxValue:[[photos childNodes] count]];
+		[progress setDoubleValue:0];
 		
-	[pool release];
+		for(PhotoNode *photo in [photos childNodes]){
+			[progress incrementBy:1];
+			[photo applyGeoTags];
+		}
+		
+	}
 }
 
 - (void)openProgress:(NSString *)txt count:(NSNumber *)count
@@ -244,7 +244,7 @@
 		GPSPoint *point=[self findPoint:date ini:0 fin:([points count]-1)];
 		[photo setGpsPoint:point];		
 
-		NSLog(@"foto: %d-%d",++c,[[photos childNodes] count]);
+		NSLog(@"foto: %d-%lu",++c,[[photos childNodes] count]);
 		NSLog(@"         tz: '%@'",tz);
 		NSLog(@"photo.dateO: '%@'",[photo dateO]);
 		NSLog(@"      dateS: '%@'",dateS);
@@ -258,7 +258,7 @@
 		[args addObject:[point latitud]];
 		[args addObject:[point longitud]];
 		[win callWebScriptMethod:@"addPhoto" withArguments:args];
-		NSLog(@"foto: %d-%d OK",++c,[[photos childNodes] count]);
+		NSLog(@"foto: %d-%lu OK",++c,[[photos childNodes] count]);
 		
 		if(selectedPhoto!=nil){
 			[self selectPhoto:selectedPhoto];
@@ -310,7 +310,7 @@
 		FSPathMakeRef((const UInt8 *)[fileName fileSystemRepresentation], &ref, NULL);
 		
 		CGImageSourceRef source = CGImageSourceCreateWithURL( (CFURLRef) CFURLCreateFromFSRef(kCFAllocatorDefault,&ref), NULL);
-		NSDictionary* metadata = (NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source,0,NULL);
+		NSDictionary* metadata = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source,0,NULL);
 		NSDictionary *exifs=[metadata objectForKey:@"{Exif}"];
 		NSMutableString *dateS=[[exifs objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] mutableCopy];
 		[dateS replaceOccurrencesOfString:@":" withString:@"-" options:0 range:NSMakeRange(0, 10)];
@@ -354,11 +354,11 @@
 }
 
 - (IBAction)setPrecisionOffSet:(id)sender{
-	int limit=[sender tag];
-	limit=(limit*60)/2;
-	[timeOffset setMaxValue:limit];
-	[timeOffset setMinValue:(limit*-1)];
-	[timeOffset setIntValue:0];
+//	int limit=[sender tag];
+//	limit=(limit*60)/2;
+//	[timeOffset setMaxValue:limit];
+//	[timeOffset setMinValue:(limit*-1)];
+//	[timeOffset setIntValue:0];
 }
 
 - (void)awakeFromNib
@@ -397,7 +397,7 @@
 	NSString *html=[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
 	if(error)
 	{
-		NSLog(@"%@:%s loading html: %@", [self class], _cmd, [error localizedDescription]);
+		NSLog(@"%@:%@ loading html: %@", [self class], NSStringFromSelector(_cmd), [error localizedDescription]);
 	}
 	[[web mainFrame] loadHTMLString:html baseURL:[NSURL URLWithString:@"http://laullon.com"]];	
 	
@@ -633,7 +633,7 @@
 	
 	NSLog(@"polyline => %@",polyline);
 	NSLog(@"leves => %@",leves);
-	NSLog(@"leves l => %d",[leves length]);
+	NSLog(@"leves l => %lu",[leves length]);
 	
 	NSDictionary *res=[NSDictionary dictionaryWithObjectsAndKeys:polyline,@"polyline",leves,@"leves",nil];
 	return res;
@@ -765,7 +765,7 @@
 				}
 			}
 		}
-		NSLog(@"TrackNode %d-%d (%d)",[tn startPoint],[tn endPoint],[[tn mutableChildNodes]count]);
+		NSLog(@"TrackNode %d-%d (%lu)",[tn startPoint],[tn endPoint],[[tn mutableChildNodes]count]);
 		[[tracks mutableChildNodes] addObject:tn];
 	}
 	
@@ -773,8 +773,6 @@
 	NSLog(@"readFromGPXFile => end");
 	[self closeProgress];
 	points=[tmpPoints copy];
-	[points retain];
-	[tmpPoints release];
 }
 
 - (NSDate *)calcDateXML:(NSXMLNode *)date
@@ -795,58 +793,58 @@
 {
 	NSMutableArray *tmpPoints = [NSMutableArray new];
 	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	@autoreleasepool {
 		
-	Device *d=[Device alloc];
-	[d setDeviceName:[self devicePath]];
-	[d open];
-	NSData *raw_data=[d leer:progress];
-	[d close];
-	
-	Memory *data=malloc(sizeof(Memory));
-	NSLog(@"%d - %d",sizeof(Memory),[raw_data length]);
-	[raw_data getBytes:data];
-	
-	[progress setIndeterminate:YES];
-	
-	int n=0;
-	int fin=false;
-	
-	
-	
-	while((!fin)){
-		[progress startAnimation:self];
-		Record *point = &(data->recodrs[n]);
-		if((n%1000)==0) NSLog(@"%d",n);
-		if((point->longitud!=-1) && (point->latitude!=-1))
-		{			
-			GPSPoint *gp=[GPSPoint alloc];
-			[gp setLongitud:[self calcAngle:point->longitud]];
-			[gp setLatitud:[self calcAngle:point->latitude]];
-			[gp setAltitud:[NSNumber numberWithLong:(point->alt+18)]];
-			[gp setVelocidad:[NSNumber numberWithChar:point->speed]];
-			[gp setTag:[NSNumber numberWithChar:point->tag]];
-			[gp setFecha:[self calcDate:point->date]];
-			
-			[tmpPoints addObject:gp];
-			
-		}else
-		{
-			fin=true;
+		Device *d=[Device alloc];
+		[d setDeviceName:[self devicePath]];
+		[d open];
+		NSData *raw_data=[d leer:progress];
+		[d close];
+		
+		Memory *data=malloc(sizeof(Memory));
+		NSLog(@"%lu - %lu",sizeof(Memory),[raw_data length]);
+		[raw_data getBytes:data];
+		
+		[progress setIndeterminate:YES];
+		
+		int n=0;
+		int fin=false;
+		
+		
+		
+		while((!fin)){
+			[progress startAnimation:self];
+			Record *point = &(data->recodrs[n]);
+			if((n%1000)==0) NSLog(@"%d",n);
+			if((point->longitud!=-1) && (point->latitude!=-1))
+			{			
+				GPSPoint *gp=[GPSPoint alloc];
+				[gp setLongitud:[self calcAngle:point->longitud]];
+				[gp setLatitud:[self calcAngle:point->latitude]];
+				[gp setAltitud:[NSNumber numberWithLong:(point->alt+18)]];
+				[gp setVelocidad:[NSNumber numberWithChar:point->speed]];
+				[gp setTag:[NSNumber numberWithChar:point->tag]];
+				[gp setFecha:[self calcDate:point->date]];
+				
+				[tmpPoints addObject:gp];
+				
+			}else
+			{
+				fin=true;
+			}
+			n++;
 		}
-		n++;
+		
+		free(data);
+		[self parsePoints:tmpPoints];
+	
 	}
-	
-	free(data);
-	[self parsePoints:tmpPoints];
-	
-	[pool release];
 }
 
 - (void)parsePoints:(NSArray *)tmpPoints
 {
 	
-	points=[[tmpPoints sortedArrayUsingSelector:@selector(compare:)] retain];
+	points=[tmpPoints sortedArrayUsingSelector:@selector(compare:)];
 	
 	
 	TrackNode *tn;
@@ -872,7 +870,7 @@
 			[nodo setPointIndex:n-1];
 			[[tn mutableChildNodes] addObject:nodo];
 			[tn setEndPoint:n-1];			
-			NSLog(@"TrackNode %d-%d (%d)",[tn startPoint],[tn endPoint],[[tn mutableChildNodes]count]);
+			NSLog(@"TrackNode %d-%d (%lu)",[tn startPoint],[tn endPoint],[[tn mutableChildNodes]count]);
 			
 			[[tracks mutableChildNodes] addObject:tn];
 			
@@ -1031,7 +1029,6 @@
 	[doc addChild:line];
 	
 	NSXMLDocument *xmlRequest = [NSXMLDocument documentWithRootElement:root];
-	[root release];
 	
 	NSData *xml=[xmlRequest XMLDataWithOptions:NSXMLNodePrettyPrint];
 	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
@@ -1081,7 +1078,7 @@ static void MyDeviceAddedCallback(void *refCon, io_iterator_t it)
 {
 	io_object_t svc;
 	
-	while (svc = IOIteratorNext(it)) {
+	while ((svc = IOIteratorNext(it))) {
 		CFTypeRef name = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYDeviceKey), kCFAllocatorDefault, 0);
 		CFTypeRef basename = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYBaseNameKey), kCFAllocatorDefault, 0);
 		CFTypeRef path = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOCalloutDeviceKey), kCFAllocatorDefault, 0);
@@ -1115,7 +1112,7 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 {
 	io_object_t svc;
 	
-	while (svc = IOIteratorNext(it)) {
+	while ((svc = IOIteratorNext(it))) {
 		CFTypeRef name = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYDeviceKey), kCFAllocatorDefault, 0);
 		if (NULL != name) {
 			CFTypeRef path = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOCalloutDeviceKey), kCFAllocatorDefault, 0);

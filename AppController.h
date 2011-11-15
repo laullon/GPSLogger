@@ -24,7 +24,7 @@
 	IBOutlet NSProgressIndicator *progress;
 	IBOutlet NSTextFieldCell *progressText;
 
-	IBOutlet NSTextFieldCell *statusBar;
+	IBOutlet NSTextFieldCell *__weak statusBar;
 	IBOutlet NSTextFieldCell *timeOffsetTXT;
 	IBOutlet NSSlider *timeOffset;
 	IBOutlet NSPopUpButton *timeZones;
@@ -48,7 +48,7 @@
 	NSTreeNode *photos;
 	
 	int selectedPoint;
-	PhotoNode *selectedPhoto;
+	PhotoNode *__weak selectedPhoto;
 	int iniMapaPoint;
 	int finMapaPoint;
 	TrackNode *selectedTrack;
@@ -62,7 +62,7 @@
 
 @property (readonly) NSTextFieldCell *statusBar;
 @property (copy) NSString *devicePath;
-@property (assign) PhotoNode *selectedPhoto;
+@property (weak) PhotoNode *selectedPhoto;
 
 - (void)addImages:(NSArray *)arrayPhotos;
 
