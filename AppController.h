@@ -9,11 +9,11 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 #import "TrackNode.h"
-#import "GLFlickr.h"
 #import "ControlController.h"
 #import "PointNode.h"
 
 @class PreferencesController;
+@class PhotoNode;
 
 @interface AppController : NSObject {
 	IBOutlet NSWindow *mainWindow;
@@ -38,9 +38,7 @@
 	IBOutlet NSImageView *imageViewer;
 	
 	IBOutlet NSForm *deviceInfo;
-	
-	IBOutlet GLFlickr *flickr;
-	
+		
 	NSMutableArray *rootArray;
 	NSArray *points;
 	NSTreeNode *wayPoints;
@@ -48,7 +46,7 @@
 	NSTreeNode *photos;
 	
 	int selectedPoint;
-	PhotoNode *__weak selectedPhoto;
+	PhotoNode *selectedPhoto;
 	int iniMapaPoint;
 	int finMapaPoint;
 	TrackNode *selectedTrack;
@@ -62,7 +60,7 @@
 
 @property (readonly) NSTextFieldCell *statusBar;
 @property (copy) NSString *devicePath;
-@property (weak) PhotoNode *selectedPhoto;
+@property (copy) PhotoNode *selectedPhoto;
 
 - (void)addImages:(NSArray *)arrayPhotos;
 
@@ -92,9 +90,6 @@
 
 - (NSDictionary *)encodeTrack:(int)ini to:(int)fin;
 
-- (void)readFromLogger;
-- (void)addImages:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void)addImagesFromDisk:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo;
 - (void)addImagesFromDisk:(NSArray *)files;
 
 - (IBAction)updateView:(id)sender;
@@ -111,15 +106,12 @@
 
 - (NSDate *)calcDateXML:(NSXMLNode *)date;
 
-- (void)displayDeviceConfig:(NSDictionary *)config;
-
 - (NSString *)encode:(double)pos;
 - (NSNumber *)calcAngleXML:(NSXMLNode *)angle;
 
 - (void)parsePoints:(NSArray *)tmpPoints;
 
 - (void)webView:(WebView *)sender setStatusText:(NSString *)text;
-- (void)webView:(WebView *)webView addMessageToConsole:(NSDictionary *)dictionary;
 - (void)webView:(WebView *)sender runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WebFrame *)frame;
 - (void)webView:(WebView *)sender didClearWindowObject:(WebScriptObject *)windowObject forFrame:(WebFrame *)frame;
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)selector;
@@ -127,9 +119,8 @@
 - (void)selectPhotoById:(NSString *)txt;
 - (void)selectPhoto:(PhotoNode *)ph;
 
-- (void)readData:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void)readFromGPXFile:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo;
 - (void)readFromGPXFile:(NSString *)file;
+- (void)readFromNMEA0183:(NSURL *)file;
 
 - (IBAction)updateTimeOffset:(id)sender;
 

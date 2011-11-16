@@ -7,8 +7,7 @@
 //
 
 #import "ControlController.h"
-#import "GPSPoint.h"; 
-
+#import "GPSPoint.h"
 
 @implementation ControlController
 

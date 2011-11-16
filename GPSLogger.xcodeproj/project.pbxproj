@@ -12,12 +12,10 @@
 		311329830E9496C300C8397D /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 311329820E9496C300C8397D /* WebKit.framework */; };
 		3153932C0E96B5F500118C54 /* PhotoNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 3153932B0E96B5F500118C54 /* PhotoNode.m */; };
 		316AA86D0E94AF9600CFE410 /* mapa.html in Resources */ = {isa = PBXBuildFile; fileRef = 316AA86C0E94AF9600CFE410 /* mapa.html */; };
-		317FCEE00E8E00D1006EA6A3 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = 317FCEDF0E8E00D1006EA6A3 /* Device.m */; };
 		31AA74E30E95C83D003E37E7 /* PointNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 31AA74E20E95C83D003E37E7 /* PointNode.m */; };
 		31AA76CE0E95F649003E37E7 /* TrackNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 31AA76CD0E95F649003E37E7 /* TrackNode.m */; };
 		31B376790E9B3640006C3056 /* ControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31B376780E9B3640006C3056 /* ControlController.m */; };
 		31B5F25A0EB595B7008CD615 /* ImageAndTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 31B5F2590EB595B7008CD615 /* ImageAndTextCell.m */; };
-		31C2251F0EA85FE6000C97F1 /* GLFlickr.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C2251E0EA85FE6000C97F1 /* GLFlickr.m */; };
 		31C3236B0E96ED9E00B5AC98 /* GPSPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C3236A0E96ED9E00B5AC98 /* GPSPoint.m */; };
 		31C54ED80E92A00A004F5997 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C54ED70E92A00A004F5997 /* AppController.m */; };
 		31CBBBFE0EAF0F4D00499DCC /* photosize.xq in Resources */ = {isa = PBXBuildFile; fileRef = 31CBBBFD0EAF0EBC00499DCC /* photosize.xq */; };
@@ -45,8 +43,6 @@
 		3153932A0E96B5F500118C54 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = English; path = English.lproj/PhotoNode.h; sourceTree = "<group>"; };
 		3153932B0E96B5F500118C54 /* PhotoNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoNode.m; sourceTree = "<group>"; };
 		316AA86C0E94AF9600CFE410 /* mapa.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = mapa.html; sourceTree = "<group>"; };
-		317FCEDE0E8E00D1006EA6A3 /* Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
-		317FCEDF0E8E00D1006EA6A3 /* Device.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
 		31AA74E10E95C83D003E37E7 /* PointNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointNode.h; sourceTree = "<group>"; };
 		31AA74E20E95C83D003E37E7 /* PointNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PointNode.m; sourceTree = "<group>"; };
 		31AA76CC0E95F649003E37E7 /* TrackNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackNode.h; sourceTree = "<group>"; };
@@ -55,8 +51,6 @@
 		31B376780E9B3640006C3056 /* ControlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ControlController.m; sourceTree = "<group>"; };
 		31B5F2580EB595B7008CD615 /* ImageAndTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextCell.h; sourceTree = "<group>"; };
 		31B5F2590EB595B7008CD615 /* ImageAndTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextCell.m; sourceTree = "<group>"; };
-		31C2251D0EA85FE6000C97F1 /* GLFlickr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLFlickr.h; sourceTree = "<group>"; };
-		31C2251E0EA85FE6000C97F1 /* GLFlickr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLFlickr.m; sourceTree = "<group>"; };
 		31C323690E96ED9E00B5AC98 /* GPSPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPSPoint.h; sourceTree = "<group>"; };
 		31C3236A0E96ED9E00B5AC98 /* GPSPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPSPoint.m; sourceTree = "<group>"; };
 		31C54ED60E92A00A004F5997 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -160,12 +154,8 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
-				317FCEDE0E8E00D1006EA6A3 /* Device.h */,
-				317FCEDF0E8E00D1006EA6A3 /* Device.m */,
 				311327AE0E94513C00C8397D /* LinksNode.h */,
 				311327AF0E94513C00C8397D /* LinksNode.m */,
-				31C2251D0EA85FE6000C97F1 /* GLFlickr.h */,
-				31C2251E0EA85FE6000C97F1 /* GLFlickr.m */,
 				31EBA9000ED3F75E006F4885 /* PreferencesController.h */,
 				31EBA9010ED3F75E006F4885 /* PreferencesController.m */,
 			);
@@ -273,7 +263,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
-				317FCEE00E8E00D1006EA6A3 /* Device.m in Sources */,
 				31C54ED80E92A00A004F5997 /* AppController.m in Sources */,
 				311327B00E94513C00C8397D /* LinksNode.m in Sources */,
 				31AA74E30E95C83D003E37E7 /* PointNode.m in Sources */,
@@ -281,7 +270,6 @@
 				3153932C0E96B5F500118C54 /* PhotoNode.m in Sources */,
 				31C3236B0E96ED9E00B5AC98 /* GPSPoint.m in Sources */,
 				31B376790E9B3640006C3056 /* ControlController.m in Sources */,
-				31C2251F0EA85FE6000C97F1 /* GLFlickr.m in Sources */,
 				31B5F25A0EB595B7008CD615 /* ImageAndTextCell.m in Sources */,
 				31EBA9020ED3F75E006F4885 /* PreferencesController.m in Sources */,
 			);

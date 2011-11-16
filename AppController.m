@@ -9,12 +9,9 @@
 #import <WebKit/WebKit.h>
 #include <IOKit/serial/IOSerialKeys.h>
 #include <complex.h>
-
-
+#include "PhotoNode.h"
 #import "AppController.h"
-#import "Device.h"
 
-@class Device;
 @class PhotoNode;
 @class ImageAndTextCell;
 
@@ -30,38 +27,15 @@
 
 - (IBAction)addImagesAction:(id)sender
 {
-	NSAlert *alert = [[NSAlert alloc] init];
-	NSButton *bt=[alert addButtonWithTitle:@"From Disk"];
-	[bt setTag:DISCK_BT];
-	bt=[alert addButtonWithTitle:@"From Flickr"];
-	[bt setTag:FLICKR_BT];
-	bt=[alert addButtonWithTitle:@"Cancel"];
-	[bt setTag:-1];
-	[alert setMessageText:@"Add Photos"];
-	[alert setInformativeText:@"Select the source of Photos:"];
-	[alert setAlertStyle:NSWarningAlertStyle];
-	[alert beginSheetModalForWindow:mainWindow modalDelegate:self didEndSelector:@selector(addImages:returnCode:contextInfo:) contextInfo:nil];
-	
-}
-
-- (void)addImages:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
-	NSLog(@"addImages returnCode=%d",returnCode);
-	[[alert window] orderOut:self];
-	
-	if(returnCode==DISCK_BT){
-		NSOpenPanel * panel = [NSOpenPanel openPanel];
-		[panel setAllowsMultipleSelection:YES];
-		[panel beginSheetForDirectory:nil 
-								 file:nil 
-								types:[NSArray arrayWithObjects:@"jpg",nil]
-					   modalForWindow:mainWindow
-						modalDelegate:self
-					   didEndSelector:@selector(addImagesFromDisk:returnCode:contextInfo:)
-						  contextInfo:nil];
-	}else if(returnCode==FLICKR_BT){
-		[flickr beginSheetSelector:mainWindow delegate:self didEndSelector:@selector(addImages:)];
-	}
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    [panel setAllowsMultipleSelection:YES];
+    [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"jpg",nil]];
+    [panel beginSheetModalForWindow:mainWindow completionHandler:^(NSInteger result) {
+        if(result==NSFileHandlingPanelOKButton){
+            NSArray *files=[panel URLs];
+            [self addImagesFromDisk:files];
+        }
+    }];
 }
 
 - (void)_applyGeoTags:(PhotoNode *)photo
@@ -180,7 +154,7 @@
 - (void)applyGeoTags
 {
 	@autoreleasepool {
-	
+        
 		[progressText setStringValue:@"Applying GeoTags"];
 		[progress setIndeterminate:NO];
 		[progress setMaxValue:[[photos childNodes] count]];
@@ -207,7 +181,7 @@
 {
 	[progressText setStringValue:@""];
 	[progress setHidden:YES];
-
+    
 }
 
 - (void)positionImages
@@ -220,7 +194,7 @@
 	if([points count]==0) return;
 	if([[photos childNodes] count]==0) return;
 	if(tz==nil) return;
-		
+    
 	id win = [web windowScriptObject];	
 	
 	/*[progressText setStringValue:@"Positioning photos on map"];
@@ -234,16 +208,16 @@
 	int c=0;
 	[win callWebScriptMethod:@"clearPhotos" withArguments:nil];
 	for(PhotoNode *photo in [photos childNodes]){
-
+        
 		NSMutableString *dateS=[NSMutableString stringWithString:[photo dateO]];
 		[dateS appendString:@" "];
 		[dateS appendString:[tz abbreviation]];
 		[photo setDate:[df dateFromString:dateS]];
-
+        
 		NSDate *date=[[photo date] dateByAddingTimeInterval:[off doubleValue]];
 		GPSPoint *point=[self findPoint:date ini:0 fin:([points count]-1)];
 		[photo setGpsPoint:point];		
-
+        
 		NSLog(@"foto: %d-%lu",++c,[[photos childNodes] count]);
 		NSLog(@"         tz: '%@'",tz);
 		NSLog(@"photo.dateO: '%@'",[photo dateO]);
@@ -283,7 +257,7 @@
 		[photo setDelegate:[p objectForKey:@"delegate"]];
 		[photo setDate:[NSDate dateWithString:dateS]];
 		[photo setDateO:[p objectForKey:@"date"]];
-		[photo setURL:[NSURL URLWithString:[p objectForKey:@"url"]]];
+		[photo setURL:[p objectForKey:@"url"]];
 		[photo setAuxProperties:p];
 		
 		[[photos mutableChildNodes] addObject:photo];
@@ -293,21 +267,15 @@
 	[self positionImages];
 }
 
-- (void)addImagesFromDisk:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
-{
-	NSArray *files=[panel filenames];
-	[self addImagesFromDisk:files];
-}
-
 - (void)addImagesFromDisk:(NSArray *)files
 {
-	NSString *fileName;
+	NSURL *fileName;
 	NSMutableArray *res=[NSMutableArray arrayWithCapacity:[files count]];
 	for(fileName in files)
 	{
 		NSLog(@"fileName='%@'",fileName);
 		FSRef ref;
-		FSPathMakeRef((const UInt8 *)[fileName fileSystemRepresentation], &ref, NULL);
+		FSPathMakeRef((const UInt8 *)[[fileName path] fileSystemRepresentation], &ref, NULL);
 		
 		CGImageSourceRef source = CGImageSourceCreateWithURL( (CFURLRef) CFURLCreateFromFSRef(kCFAllocatorDefault,&ref), NULL);
 		NSDictionary* metadata = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source,0,NULL);
@@ -317,9 +285,9 @@
 		//[dateS appendString:@" +0000"];
 		
 		NSString *name=[fileName lastPathComponent];
-		NSString *url=[NSString stringWithFormat:@"file://%@",[[NSURL URLWithString:fileName] absoluteString]];
+//		NSString *url=[NSString stringWithFormat:@"file://%@",[[NSURL URLWithString:fileName] absoluteString]];
 		
-		[res addObject:[NSDictionary dictionaryWithObjectsAndKeys:name,@"name",url,@"url",dateS,@"date",self,@"delegate",nil]];
+		[res addObject:[NSDictionary dictionaryWithObjectsAndKeys:name,@"name",fileName,@"url",dateS,@"date",self,@"delegate",nil]];
 	}
 	[self addImages:res];
 }
@@ -354,11 +322,11 @@
 }
 
 - (IBAction)setPrecisionOffSet:(id)sender{
-//	int limit=[sender tag];
-//	limit=(limit*60)/2;
-//	[timeOffset setMaxValue:limit];
-//	[timeOffset setMinValue:(limit*-1)];
-//	[timeOffset setIntValue:0];
+    //	int limit=[sender tag];
+    //	limit=(limit*60)/2;
+    //	[timeOffset setMaxValue:limit];
+    //	[timeOffset setMinValue:(limit*-1)];
+    //	[timeOffset setIntValue:0];
 }
 
 - (void)awakeFromNib
@@ -368,15 +336,13 @@
 	 [sISO8601 setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZ"];*/
 	
 	// googel maps test
-	NSLog(@"-> %@",[self encode:-179.98321]);
-	NSLog(@"-> %@",[self encode:38.5]);
-	NSLog(@"-> %@",[self encode:40.7-38.5]);
-	NSLog(@"-> %@",[self encode:43.252-40.7]);
-	NSLog(@"-> %@",[self encode:-120.2]);
-	NSLog(@"-> %@",[self encode:-120.95-(-120.2)]);
-	NSLog(@"-> %@",[self encode:-126.453-(-120.95)]);
-	
-	initUSB(self);
+    //	NSLog(@"-> %@",[self encode:-179.98321]);
+    //	NSLog(@"-> %@",[self encode:38.5]);
+    //	NSLog(@"-> %@",[self encode:40.7-38.5]);
+    //	NSLog(@"-> %@",[self encode:43.252-40.7]);
+    //	NSLog(@"-> %@",[self encode:-120.2]);
+    //	NSLog(@"-> %@",[self encode:-120.95-(-120.2)]);
+    //	NSLog(@"-> %@",[self encode:-126.453-(-120.95)]);
 	
 	rootArray = [NSMutableArray new];
 	
@@ -406,7 +372,7 @@
 	
 	NSLog(@"p -->%@",[[web preferences] arePlugInsEnabled]);
 	NSLog(@"j -->%@",[[web preferences] isJavaEnabled]);
-		
+    
 	NSArray *timeZoneNames = [[[NSTimeZone abbreviationDictionary] allValues] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 	NSString *tzName;
 	[timeZones removeAllItems];
@@ -415,7 +381,7 @@
 	}
 	[timeZones setTitle:[[NSTimeZone localTimeZone] name]];
 	[timeZones selectItemWithTitle:[[NSTimeZone localTimeZone] name]];
-
+    
 #ifdef DEBUG 
 	[self performSelectorInBackground:@selector(debugInit) withObject:nil];
 #endif 
@@ -444,13 +410,13 @@
 	int m=time-(h*60);
 	NSString *st=[NSString stringWithFormat:@"%c%0#2d:%0#2d",s,h,m];
 	[timeOffsetTXT setStringValue:st];
-
+    
 	NSLog(@"-> %@",sender);
 	NSLog(@"-> %@",[mainWindow currentEvent]);
 	
 	if(sender==timeZones){
 		[timeZones setTitle:[timeZones titleOfSelectedItem]];
-
+        
 	}
 	
 	if([[mainWindow currentEvent] type]==NSLeftMouseUp){
@@ -662,48 +628,81 @@
 
 - (IBAction)readFromLoggerAction:(id)sender
 {
-	NSAlert *alert = [[NSAlert alloc] init];
-	NSButton *bt=[alert addButtonWithTitle:@"From GPX File"];
-	[bt setTag:1];
-	bt=[alert addButtonWithTitle:@"From Device"];
-	[bt setTag:2];
-	bt=[alert addButtonWithTitle:@"Cancel"];
-	[bt setTag:-1];
-	[alert setMessageText:@"Read GPS Data"];
-	[alert setInformativeText:@"Select the source of GPS Data:"];
-	[alert setAlertStyle:NSWarningAlertStyle];
-	[alert beginSheetModalForWindow:mainWindow modalDelegate:self didEndSelector:@selector(readData:returnCode:contextInfo:) contextInfo:nil];
-}
-
-- (void)readData:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
-{
 	NSOpenPanel *panel;			
-	[[alert window] orderOut:self];
-	switch(returnCode){
-		case 1:
-			panel = [NSOpenPanel openPanel];
-			[panel setAllowsMultipleSelection:NO];
-			[panel beginSheetForDirectory:nil 
-									 file:nil 
-									types:[NSArray arrayWithObjects:@"gpx",nil]
-						   modalForWindow:mainWindow
-							modalDelegate:self
-						   didEndSelector:@selector(readFromGPXFile:returnCode:contextInfo:)
-							  contextInfo:nil];
-			break;
-		case 2:
-			[self performSelectorInBackground:@selector(readFromLogger) withObject:nil];
-			break;
-	}
+    panel = [NSOpenPanel openPanel];
+    [panel setAllowsMultipleSelection:YES];
+    [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"gpx",@"log",nil]];
+    [panel beginSheetModalForWindow:mainWindow completionHandler:^(NSInteger result) {
+        if(result==NSFileHandlingPanelOKButton){
+            for(NSURL *url in [panel URLs]){
+            	[self performSelectorInBackground:@selector(readFromGPXFile:) withObject:url];
+            }
+        }
+    }];
 }
 
-- (void)readFromGPXFile:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+-(void)readFromNMEA0183:(NSURL *)file
 {
-	NSString *file=[panel filename];
-	[self performSelectorInBackground:@selector(readFromGPXFile:) withObject:file];
+    NSError *err=nil;
+    NSString *log = [NSString stringWithContentsOfURL:file encoding:NSASCIIStringEncoding error:&err];
+	if(err)
+	{
+		NSLog(@"readFromGPXFile => Error = %@",err);
+		return;
+	}
+    
+    NSString *str;
+    int n=0;
+    
+	NSMutableArray *tmpPoints = [NSMutableArray new];
+    NSScanner *scanner = [NSScanner scannerWithString:log];
+    TrackNode *tn=[TrackNode treeNodeWithRepresentedObject:[file lastPathComponent]];
+    while ([scanner scanUpToString:@"$GP" intoString:nil]) {
+        if([scanner scanUpToString:@"," intoString:&str]){
+            NSLog(@"< %@ >",str);
+            if([str isEqualToString:@"$GPRMC"]){
+                if([scanner scanUpToString:@"*" intoString:&str]){
+                    str = [str substringFromIndex:1]; // quitamos la primera ,
+                    NSLog(@"- %@ -",str);
+                    NSArray *comps = [str componentsSeparatedByString:@","];
+                    
+                    if([[comps objectAtIndex:1] isEqualToString:@"A"]){
+                        GPSPoint *gp=[GPSPoint alloc];
+                        [gp setIndex:[NSNumber numberWithInt:n]];
+                        
+                        double rawLatLng = [[comps objectAtIndex:4] doubleValue];
+                        double d = floor(rawLatLng / 100) +  ((rawLatLng - (floor(rawLatLng / 100) * 100)) / 60);
+                        NSLog(@"> %f => %f",rawLatLng,d);
+                        if([[comps objectAtIndex:5] isEqualToString:@"W"]){
+                            d = d*-1;
+                        }
+                        [gp setLongitud:[NSNumber numberWithDouble:d]];
+                        
+                        rawLatLng = [[comps objectAtIndex:2] doubleValue];
+                        d = floor(rawLatLng / 100) +  ((rawLatLng - (floor(rawLatLng / 100) * 100)) / 60);
+                        NSLog(@"> %f => %f",rawLatLng,d);
+                        if([[comps objectAtIndex:5] isEqualToString:@"S"]){
+                            d = d*-1;
+                        }
+                        [gp setLatitud:[NSNumber numberWithDouble:d]];
+                        
+                        [tmpPoints addObject:gp];
+                        
+                        //enlazamos con el track
+                        [gp setTrack:tn];
+                        [tn setEndPoint:n];			
+                        n++;
+                    }
+                }
+			}
+        }        
+    }
+    [[tracks mutableChildNodes] addObject:tn];
+    points=[tmpPoints copy];
+    
 }
 
--(void)readFromGPXFile:(NSString *)file
+-(void)readFromGPXFile:(NSURL *)file
 {
 	NSMutableArray *tmpPoints = [NSMutableArray new];
     NSError *err=nil;
@@ -711,11 +710,11 @@
 	[self openProgress:@"Loading GPX File" count:0];
 	
 	NSLog(@"readFromGPXFile => file = '%@'",file);
-	NSURL *furl = [NSURL fileURLWithPath:file];
-	NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA) error:&err];
+	NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:file options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA) error:&err];
 	if(err)
 	{
 		NSLog(@"readFromGPXFile => Error = %@",err);
+        [self readFromNMEA0183:file];
 		return;
 	}
 	
@@ -787,58 +786,6 @@
 	NSNumber *res=[NSNumber numberWithDouble:[[angle stringValue]doubleValue]];
 	//NSLog(@"%@",[date stringValue]);
 	return res;
-}
-
-- (void)readFromLogger
-{
-	NSMutableArray *tmpPoints = [NSMutableArray new];
-	
-	@autoreleasepool {
-		
-		Device *d=[Device alloc];
-		[d setDeviceName:[self devicePath]];
-		[d open];
-		NSData *raw_data=[d leer:progress];
-		[d close];
-		
-		Memory *data=malloc(sizeof(Memory));
-		NSLog(@"%lu - %lu",sizeof(Memory),[raw_data length]);
-		[raw_data getBytes:data];
-		
-		[progress setIndeterminate:YES];
-		
-		int n=0;
-		int fin=false;
-		
-		
-		
-		while((!fin)){
-			[progress startAnimation:self];
-			Record *point = &(data->recodrs[n]);
-			if((n%1000)==0) NSLog(@"%d",n);
-			if((point->longitud!=-1) && (point->latitude!=-1))
-			{			
-				GPSPoint *gp=[GPSPoint alloc];
-				[gp setLongitud:[self calcAngle:point->longitud]];
-				[gp setLatitud:[self calcAngle:point->latitude]];
-				[gp setAltitud:[NSNumber numberWithLong:(point->alt+18)]];
-				[gp setVelocidad:[NSNumber numberWithChar:point->speed]];
-				[gp setTag:[NSNumber numberWithChar:point->tag]];
-				[gp setFecha:[self calcDate:point->date]];
-				
-				[tmpPoints addObject:gp];
-				
-			}else
-			{
-				fin=true;
-			}
-			n++;
-		}
-		
-		free(data);
-		[self parsePoints:tmpPoints];
-	
-	}
 }
 
 - (void)parsePoints:(NSArray *)tmpPoints
@@ -987,9 +934,9 @@
 	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
 	
 	NSSavePanel *p=[NSSavePanel savePanel];
-	[p setRequiredFileType:@"gpx"];
+	[p setAllowedFileTypes:[NSArray arrayWithObject:@"gpx"]];
 	if([p runModal]==NSFileHandlingPanelOKButton)
-		[xml writeToFile:[p filename] atomically:true];
+		[xml writeToFile:[[p URL] path] atomically:true];
 	
 }
 
@@ -1032,105 +979,15 @@
 	
 	NSData *xml=[xmlRequest XMLDataWithOptions:NSXMLNodePrettyPrint];
 	NSLog(@"XML Document\n%@", [NSString stringWithCString:[xml bytes] encoding:NSUTF8StringEncoding]);
-
+    
 	NSSavePanel *p=[NSSavePanel savePanel];
-	[p setRequiredFileType:@"kml"];
+	[p setAllowedFileTypes:[NSArray arrayWithObject:@"kml"]];
 	if([p runModal]==NSFileHandlingPanelOKButton)
-		[xml writeToFile:[p filename] atomically:true];
-	
-	
-	//return [xmlRequest XMLData];
-}
-
--(void)displayDeviceConfig:(NSDictionary *)config
-{
-	for (id key in config)
-	{
-		NSLog(@"key: %@, value: %@", key, [config objectForKey:key]);
-		NSFormCell *cell=[deviceInfo addEntry:key];
-		[cell setEditable:NO];
-		[cell setStringValue:[config objectForKey:key]];
-	}
-	[deviceInfo setNeedsDisplay:YES];
-}
-
-AppController *appController;
-static void initUSB(AppController *app)
-{
-	appController=app;
-	CFMutableDictionaryRef matchingServices = IOServiceMatching(kIOSerialBSDServiceValue);
-	CFDictionarySetValue(matchingServices, CFSTR(kIOSerialBSDTypeKey), CFSTR(kIOSerialBSDModemType));
-	
-	notePort = IONotificationPortCreate(kIOMasterPortDefault);
-	runLoopSource = IONotificationPortGetRunLoopSource(notePort);
-	
-	CFRetain(matchingServices);
-	IOServiceAddMatchingNotification(notePort, kIOFirstMatchNotification, matchingServices, MyDeviceAddedCallback, NULL, &addedIter);
-	MyDeviceAddedCallback(NULL, addedIter);
-	IOServiceAddMatchingNotification(notePort, kIOTerminatedNotification, matchingServices, MyDeviceRemovedCallback, NULL, &removedIter);
-	MyDeviceRemovedCallback(NULL, removedIter);
-	
-	CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
+		[xml writeToFile:[[p URL] path] atomically:true];
 }
 
 
-static void MyDeviceAddedCallback(void *refCon, io_iterator_t it)
-{
-	io_object_t svc;
-	
-	while ((svc = IOIteratorNext(it))) {
-		CFTypeRef name = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYDeviceKey), kCFAllocatorDefault, 0);
-		CFTypeRef basename = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYBaseNameKey), kCFAllocatorDefault, 0);
-		CFTypeRef path = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOCalloutDeviceKey), kCFAllocatorDefault, 0);
-		if ((NULL != name) && (NULL != basename) && (NULL != path)) {
-			NSLog(@"-->name:'%@' basename:'%@' path:'%@'",name,basename,path);
-			if([@"usbmodem" isEqual:[NSString stringWithFormat:@"%@",basename]]){
-				Device *d=[Device alloc];
-				[d setDeviceName:[NSString stringWithFormat:@"%@",path]];
-				[d open];
-				NSString *res=[d test];
-				NSLog(@"test result --- '%@'",res);
-				if([res hasPrefix:@"WondeProud Tech. Co. BT-CD110"] || [res hasPrefix:@"WP GPS+BT"]){
-					[[appController statusBar] setStringValue:[NSString stringWithFormat:@"Device: '%@' Path: '%@'",res,path]];
-					[appController setDevicePath:[NSString stringWithFormat:@"%@",path]];
-					[d setDeviceName:[NSString stringWithFormat:@"%@",path]];
-					[appController displayDeviceConfig:[d getConfig]];
-				}else{
-					
-				}
-				[d close];
-			}
-			CFRelease(path);
-		}
-		CFRelease(name);
-	}
-	IOObjectRelease(svc);
-	
-}
-
-static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
-{
-	io_object_t svc;
-	
-	while ((svc = IOIteratorNext(it))) {
-		CFTypeRef name = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOTTYDeviceKey), kCFAllocatorDefault, 0);
-		if (NULL != name) {
-			CFTypeRef path = IORegistryEntryCreateCFProperty(svc, CFSTR(kIOCalloutDeviceKey), kCFAllocatorDefault, 0);
-			if (NULL != path) {
-				NSLog(@"->%@",path);
-				if([[appController devicePath] isEqualToString:[NSString stringWithFormat:@"%@",path]]){
-					[[appController statusBar] setStringValue:[NSString stringWithFormat:@"Device: NO GPS DEVICE"]];
-					[appController setDevicePath:@""];
-				}
-				CFRelease(path);
-			}
-			CFRelease(name);
-		}
-		IOObjectRelease(svc);
-	}
-}
-
-- (void)webView:(WebView *)webView addMessageToConsole:(NSDictionary *)dictionary
+- (void)webView:(WebView *)webView addMessageToConsle:(NSDictionary *)dictionary
 {
 	NSLog(@"addMessageToConsole == %@ ==",dictionary);
 }
@@ -1179,7 +1036,7 @@ static void MyDeviceRemovedCallback(void *refCon, io_iterator_t it)
 	 NSLog(@"---------%@---------",[[item representedObject]class]);
 	 }
 	 NSLog(@"---------willDisplayCell---------");
-	*/
+     */
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame{
