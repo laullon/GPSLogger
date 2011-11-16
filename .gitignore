@@ -1,19 +1,15 @@
-
-
-# xcode/mac files
-*~.nib/
-*.perspective
-*.perspectivev3
-*.pbxuser
-*.mode1v3
 .DS_Store
-profile
-._*
+*.swp
+*~.nib
 
-# backup files
-*~
-*.bak
-
-# Build/Output Files Directories
 build/
 
+*.pbxuser
+*.perspective
+*.perspectivev3
+
+*.mode1v3
+*.mode2v3
+
+xcuserdata
+DerivedData
