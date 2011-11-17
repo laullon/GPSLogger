@@ -35,7 +35,7 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-    return [item isKindOfClass:[NSTreeNode class]];
+    return !([item isKindOfClass:[TrackNode class]] || [item isKindOfClass:[PhotoNode class]]);
 }
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item

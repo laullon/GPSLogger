@@ -158,6 +158,7 @@
 
 - (void)positionImages
 {
+    return;
 	NSTimeZone *tz=[NSTimeZone timeZoneWithName:[timeZones titleOfSelectedItem]];
 	NSNumber *off=[NSNumber numberWithInt:[timeOffset intValue]];
 	NSLog(@"positionImages start");
@@ -588,5 +589,28 @@
     return !([node isKindOfClass:[TrackNode class]] || [node isKindOfClass:[PhotoNode class]]);
 }
 
+- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
+    NSView *res;
+    if ([item isKindOfClass:[TrackNode class]]) {
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+    } else if ([item isKindOfClass:[PhotoNode class]]) {
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+    } else {
+        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:outlineView];
+    }
+    return res;
+}
 
+- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
+{
+    NSView *res;
+    if ([item isKindOfClass:[TrackNode class]]) {
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+    } else if ([item isKindOfClass:[PhotoNode class]]) {
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+    } else {
+        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:outlineView];
+    }
+    return res.frame.size.height;
+}
 @end

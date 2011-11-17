@@ -13,7 +13,7 @@
 @class PhotoNode;
 @class SideBarDataSource;
 
-@interface AppController : NSObject {
+@interface AppController : NSObject <NSOutlineViewDelegate> {
 	IBOutlet NSWindow *mainWindow;
 
 	IBOutlet NSTextFieldCell *timeOffsetTXT;
