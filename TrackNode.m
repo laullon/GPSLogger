@@ -7,26 +7,17 @@
 //
 
 #import "TrackNode.h"
-#import "LinksNode.h"
 
 @implementation TrackNode
--(void)setStartPoint:(int)point
+
+@synthesize points;
+
+- (id)initWithRepresentedObject:(id)modelObject
 {
-	startPoint=point;
+    if ((self = [super initWithRepresentedObject:modelObject])) {
+        points = [[NSMutableArray alloc] init];
+    }
+    return self;
 }
 
--(void)setEndPoint:(int)point
-{
-	endPoint=point;
-}
-
--(int)startPoint
-{
-	return startPoint;
-}
-
--(int)endPoint
-{
-	return endPoint;
-}
 @end

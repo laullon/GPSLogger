@@ -11,10 +11,9 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import "LinksNode.h"
 #import "GPSPoint.h"
 
-@interface PhotoNode : LinksNode {
+@interface PhotoNode : NSTreeNode {
 	NSURL* URL;
 	NSDate* date;
 	GPSPoint* __weak gpsPoint;

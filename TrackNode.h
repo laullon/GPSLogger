@@ -7,17 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "LinksNode.h"
 
-
-@interface TrackNode : LinksNode {
-	int startPoint;
-	int endPoint;
+@interface TrackNode : NSTreeNode 
+{
+    @private
+    NSMutableArray *points;
 }
 
--(void)setStartPoint:(int)point;
--(void)setEndPoint:(int)point;
+@property(readonly) NSMutableArray *points;
 
--(int)startPoint;
--(int)endPoint;
 @end
