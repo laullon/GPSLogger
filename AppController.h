@@ -9,9 +9,10 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 
-@class PreferencesController;
-@class PhotoNode;
 @class SideBarDataSource;
+@class PhotoNode;
+@class TrackNode;
+@class GPSPoint;
 
 @interface AppController : NSObject <NSOutlineViewDelegate> {
 	IBOutlet NSWindow *mainWindow;
@@ -41,7 +42,6 @@
 - (void)_applyGeoTags:(PhotoNode *)photo;
 - (BOOL)setDateDigitized:(GPSPoint *)date forPhotoWithURL:(NSURL *)URL;
 
-- (IBAction)showAllPhotosOnMap:(id)sender;
 - (IBAction)applyGeoTags:(id)sender;
 - (void)applyGeoTags;
 

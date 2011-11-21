@@ -7,7 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "TrackNode.h"
+
+@class TrackNode;
 
 @interface GPSPoint : NSObject {
 	NSNumber *index;

@@ -15,8 +15,10 @@
 		31AA76CE0E95F649003E37E7 /* TrackNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 31AA76CD0E95F649003E37E7 /* TrackNode.m */; };
 		31C3236B0E96ED9E00B5AC98 /* GPSPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C3236A0E96ED9E00B5AC98 /* GPSPoint.m */; };
 		31C54ED80E92A00A004F5997 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31C54ED70E92A00A004F5997 /* AppController.m */; };
+		31D287561475D116003B41BE /* DragAndDropOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D287551475D116003B41BE /* DragAndDropOutlineView.m */; };
 		31D606630E8E0DE90042B48F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31D606620E8E0DE90042B48F /* IOKit.framework */; };
 		31F4089F123C8EF60028EA27 /* google_city.xq in Resources */ = {isa = PBXBuildFile; fileRef = 31F4089E123C8EF60028EA27 /* google_city.xq */; };
+		31F4FF861475F88A00C7DF7F /* TimeOffsetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F4FF851475F88900C7DF7F /* TimeOffsetView.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -42,8 +44,13 @@
 		31C3236A0E96ED9E00B5AC98 /* GPSPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPSPoint.m; sourceTree = "<group>"; };
 		31C54ED60E92A00A004F5997 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
 		31C54ED70E92A00A004F5997 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
+		31D287541475D116003B41BE /* DragAndDropOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragAndDropOutlineView.h; sourceTree = "<group>"; };
+		31D287551475D116003B41BE /* DragAndDropOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DragAndDropOutlineView.m; sourceTree = "<group>"; };
+		31D287571475EB44003B41BE /* GPSLogger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = GPSLogger.entitlements; sourceTree = "<group>"; };
 		31D606620E8E0DE90042B48F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		31F4089E123C8EF60028EA27 /* google_city.xq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = google_city.xq; sourceTree = "<group>"; };
+		31F4FF841475F88900C7DF7F /* TimeOffsetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeOffsetView.h; sourceTree = "<group>"; };
+		31F4FF851475F88900C7DF7F /* TimeOffsetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeOffsetView.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* GPSLogger_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPSLogger_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* GPSLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GPSLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,15 +101,23 @@
 		29B97314FDCFA39411CA2CEA /* GPSLogger */ = {
 			isa = PBXGroup;
 			children = (
+				31D287571475EB44003B41BE /* GPSLogger.entitlements */,
 				31C323690E96ED9E00B5AC98 /* GPSPoint.h */,
 				31C3236A0E96ED9E00B5AC98 /* GPSPoint.m */,
 				31C54ED60E92A00A004F5997 /* AppController.h */,
 				31C54ED70E92A00A004F5997 /* AppController.m */,
+				31F4FF841475F88900C7DF7F /* TimeOffsetView.h */,
+				31F4FF851475F88900C7DF7F /* TimeOffsetView.m */,
+				31D287541475D116003B41BE /* DragAndDropOutlineView.h */,
+				31D287551475D116003B41BE /* DragAndDropOutlineView.m */,
+				316016C21474588200E88316 /* SideBarDataSource.h */,
+				316016C31474588200E88316 /* SideBarDataSource.m */,
+				31AA76CC0E95F649003E37E7 /* TrackNode.h */,
+				31AA76CD0E95F649003E37E7 /* TrackNode.m */,
+				31A613490E99934300B18B2C /* PhotoNode.h */,
+				3153932B0E96B5F500118C54 /* PhotoNode.m */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
-				316016CD1474843D00E88316 /* utils */,
-				316016C11474584F00E88316 /* datasources */,
 				31D5B37F0EAC107E00084B43 /* xquery */,
-				315393290E96B5DF00118C54 /* nodos */,
 				316AA86C0E94AF9600CFE410 /* mapa.html */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -137,33 +152,6 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		315393290E96B5DF00118C54 /* nodos */ = {
-			isa = PBXGroup;
-			children = (
-				31AA76CC0E95F649003E37E7 /* TrackNode.h */,
-				31AA76CD0E95F649003E37E7 /* TrackNode.m */,
-				31A613490E99934300B18B2C /* PhotoNode.h */,
-				3153932B0E96B5F500118C54 /* PhotoNode.m */,
-			);
-			name = nodos;
-			sourceTree = "<group>";
-		};
-		316016C11474584F00E88316 /* datasources */ = {
-			isa = PBXGroup;
-			children = (
-				316016C21474588200E88316 /* SideBarDataSource.h */,
-				316016C31474588200E88316 /* SideBarDataSource.m */,
-			);
-			name = datasources;
-			sourceTree = "<group>";
-		};
-		316016CD1474843D00E88316 /* utils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = utils;
 			sourceTree = "<group>";
 		};
 		31D5B37F0EAC107E00084B43 /* xquery */ = {
@@ -244,6 +232,8 @@
 				3153932C0E96B5F500118C54 /* PhotoNode.m in Sources */,
 				31C3236B0E96ED9E00B5AC98 /* GPSPoint.m in Sources */,
 				316016C41474588200E88316 /* SideBarDataSource.m in Sources */,
+				31D287561475D116003B41BE /* DragAndDropOutlineView.m in Sources */,
+				31F4FF861475F88A00C7DF7F /* TimeOffsetView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +272,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = GPSLogger.entitlements;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -304,6 +295,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = GPSLogger.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

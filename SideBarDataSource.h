@@ -16,14 +16,9 @@
 	NSTreeNode *photos;
 }
 
--(void)readFromNMEA0183:(NSURL *)file;
--(void)readFromGPXFile:(NSURL *)file;
--(void)addImagesFromDisk:(NSArray *)files;
+-(void)readFiles:(NSArray *)files;
 
 -(NSArray *)photos;
 -(NSArray *)tracks;
-
--(NSNumber *)calcAngleXML:(NSXMLNode *)angle;
--(NSDate *)calcDateXML:(NSXMLNode *)date;
 
 @end

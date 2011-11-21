@@ -7,9 +7,11 @@
 //
 
 #include <WebKit/WebKit.h>
-#include "PhotoNode.h"
 #include "AppController.h"
 #include "SideBarDataSource.h"
+#include "TrackNode.h"
+#include "PhotoNode.h"
+#include "GPSPoint.h"
 
 @interface AppController (hiddem)
 -(GPSPoint *)findPoint:(NSDate *)fecha;
@@ -30,7 +32,7 @@
     [panel beginSheetModalForWindow:mainWindow completionHandler:^(NSInteger result) {
         if(result==NSFileHandlingPanelOKButton){
             NSArray *files=[panel URLs];
-            [sideBarDS addImagesFromDisk:files];
+            [sideBarDS readFiles:files];
         }
         [self positionImages];
     }];
@@ -151,9 +153,9 @@
 
 - (void)applyGeoTags
 {
-    for(PhotoNode *photo in sideBarDS.photos){
-        [photo applyGeoTags];
-    }
+//    for(PhotoNode *photo in sideBarDS.photos){
+//        [photo applyGeoTags];
+//    }
 }
 
 - (void)positionImages
@@ -293,17 +295,16 @@
 #endif 
 }
 
+
 -(void)debugInit
 {
-	[sideBarDS readFromGPXFile:[NSURL URLWithString:[NSString stringWithFormat:@"file://localhost/Users/laullon/Desktop/todo.gpx"]]];
-	NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Users/laullon/Desktop/new_orleans_bourbon_st" error:nil];
+	NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Users/laullon/Desktop/testGPSLogger" error:nil];
 	NSMutableArray *files=[NSMutableArray arrayWithCapacity:[dirContents count]];
 	for(NSString *fileName in dirContents){
-		[files addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://localhost/Users/laullon/Desktop/new_orleans_bourbon_st/%@",fileName]]];
+		[files addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://localhost/Users/laullon/Desktop/testGPSLogger/%@",fileName]]];
 	}
-	[sideBarDS addImagesFromDisk:files];
+	[sideBarDS readFiles:files];
     [self positionImages];
-	[self showAllPhotosOnMap:nil];
 }
 
 
@@ -373,10 +374,6 @@
 	}
 }
 
-- (IBAction)showAllPhotosOnMap:(id)sender{
-	[[web windowScriptObject] callWebScriptMethod:@"showAllPhotos" withArguments:nil];
-}
-
 - (void)updateTrack:(TrackNode *)node
 {
 	if(node==selectedTrack) return;
@@ -401,9 +398,7 @@
     [panel setAllowedFileTypes:[NSArray arrayWithObjects:@"gpx",@"log",nil]];
     [panel beginSheetModalForWindow:mainWindow completionHandler:^(NSInteger result) {
         if(result==NSFileHandlingPanelOKButton){ // todo: run this in a async queue
-            for(NSURL *url in [panel URLs]){
-            	[sideBarDS readFromGPXFile:url];
-            }
+            [sideBarDS readFiles:[panel URLs]];
         }
         [sideBar reloadData];
     }];
@@ -503,10 +498,10 @@
 	[fotos addChild:[[NSXMLElement alloc] initWithName:@"name" stringValue:@"fotos"]];
 	[fotos addChild:[[NSXMLElement alloc] initWithName:@"description" stringValue:@"description"]];
 	
-	PhotoNode *photo;
-	for(photo in sideBarDS.photos){
-		[fotos addChild:[photo getKMLElement]];
-	}
+//	PhotoNode *photo;
+//	for(photo in sideBarDS.photos){
+//		[fotos addChild:[photo getKMLElement]];
+//	}
 	
 	NSMutableString *coors=[NSMutableString string];
 	GPSPoint *gp;
@@ -592,11 +587,11 @@
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
     NSView *res;
     if ([item isKindOfClass:[TrackNode class]]) {
-        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:nil];
     } else if ([item isKindOfClass:[PhotoNode class]]) {
-        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:nil];
     } else {
-        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:nil];
     }
     return res;
 }
@@ -605,11 +600,11 @@
 {
     NSView *res;
     if ([item isKindOfClass:[TrackNode class]]) {
-        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:nil];
     } else if ([item isKindOfClass:[PhotoNode class]]) {
-        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"DataCell" owner:nil];
     } else {
-        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:outlineView];
+        res = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:nil];
     }
     return res.frame.size.height;
 }

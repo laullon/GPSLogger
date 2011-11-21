@@ -11,6 +11,14 @@
 #import "TrackNode.h"
 #import "GPSPoint.h"
 
+@interface SideBarDataSource (hiddem)
+-(void)readFromNMEA0183:(NSURL *)file;
+-(void)readFromGPXFile:(NSURL *)file;
+-(void)readImage:(NSURL *)fileName;
+-(NSNumber *)calcAngleXML:(NSXMLNode *)angle;
+-(NSDate *)calcDateXML:(NSXMLNode *)date;
+@end
+
 @implementation SideBarDataSource
 
 - (void)awakeFromNib
@@ -66,6 +74,21 @@
 }
 
 #pragma mark - read
+
+-(void)readFiles:(NSArray *)files
+{
+    for(NSURL *file in files){
+        NSString *type = [[NSWorkspace sharedWorkspace] typeOfFile:file.path error:nil];
+        NSLog(@"type=%@",type);
+        if([type hasSuffix:@"gpx"]){
+            [self readFromGPXFile:file];
+        }else if([type hasSuffix:@"log"]){
+            [self readFromNMEA0183:file];
+        }else if([type hasSuffix:@"public.jpeg"]){
+            [self readImage:file];
+        }
+    }
+}
 
 -(void)readFromNMEA0183:(NSURL *)file
 {
@@ -181,11 +204,8 @@
 	}
 }
 
-- (void)addImagesFromDisk:(NSArray *)files
+- (void)readImage:(NSURL *)fileName
 {
-	for(NSURL *fileName in files)
-	{
-		NSLog(@"fileName='%@'",fileName);
 		FSRef ref;
 		FSPathMakeRef((const UInt8 *)[[fileName path] fileSystemRepresentation], &ref, NULL);
 		
@@ -202,7 +222,6 @@
 		[photo setDateO:dateS];
 		[photo setURL:fileName];
         [[photos mutableChildNodes] addObject:photo];
-	}
 }
 
 #pragma mark - utils

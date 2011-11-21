@@ -15,27 +15,5 @@
 @synthesize dateO;
 @synthesize gpsPoint;
 @synthesize name;
-@synthesize width;
-@synthesize height;
-@synthesize delegate;
-@synthesize auxProperties;
-
--(void)applyGeoTags
-{
-	[delegate performSelector:@selector(_applyGeoTags:) withObject:self];
-}
-
--(NSXMLElement *)getKMLElement
-{
-	NSString *des=[NSString stringWithFormat:@"g<img src=\"%@\" width=\"%@\" height=\"%@\"/>",[[self URL] path],[self width],[self height]]; 
-	
-	NSXMLElement *place = [NSXMLElement elementWithName:@"Placemark"];
-	[place addChild:[NSXMLElement elementWithName:@"name" stringValue:[self name]]];
-	[place addChild:[NSXMLElement elementWithName:@"description" stringValue:des]];
-	NSXMLElement *point=[NSXMLElement elementWithName:@"Point"];
-	[point addChild:[NSXMLElement elementWithName:@"coordinates" stringValue:[NSString stringWithFormat:@"%@, %@",[gpsPoint longitud],[gpsPoint latitud]]]];
-	[place addChild:point];
-	return place;
-}
 
 @end
